@@ -18,6 +18,7 @@ dependencies {
 
     compile group: 'com.typesafe.akka', name: 'akka-cluster_2.12', version: '2.5.13'
     compile group: 'com.typesafe.akka', name: 'akka-cluster-sharding_2.12', version: '2.5.13'
+    compile group: 'com.typesafe.akka', name: 'akka-distributed-data_2.12', version: '2.5.13'
     compile group: 'com.typesafe.akka', name: 'akka-persistence_2.12', version: '2.5.13'
     compile group: 'com.typesafe.akka', name: 'akka-persistence-cassandra_2.12', version: '0.85'
     compile group: 'com.typesafe.akka', name: 'akka-persistence-cassandra-launcher_2.12', version: '0.85'
