@@ -12,7 +12,6 @@ import akka.http.javadsl.model.HttpResponse;
 import akka.http.javadsl.model.StatusCodes;
 import akka.http.javadsl.server.AllDirectives;
 import akka.http.javadsl.server.Route;
-import akka.http.javadsl.unmarshalling.StringUnmarshallers;
 import akka.stream.ActorMaterializer;
 import akka.stream.javadsl.Flow;
 import akka.util.Timeout;
@@ -27,6 +26,7 @@ import java.util.concurrent.CompletionStage;
 import java.util.concurrent.TimeUnit;
 
 import static akka.pattern.PatternsCS.ask;
+import static akka.http.javadsl.server.PathMatchers.segment;
 
 import java.io.File;
 
@@ -65,32 +65,31 @@ public class RunChatRoomMicroservice extends AllDirectives {
     private RunChatRoomMicroservice(final ActorSystem system) {
         client = system.actorOf(ClusterClient.props(
                 ClusterClientSettings.create(system).withInitialContacts(
-                        NetworkUtility.initialContacts(NetworkUtility.CHAT_ROOM_SYSTEM_NAME, NetworkUtility.CHAT_ROOM_FIRST_PORT))),
-                "client");
+                        NetworkUtility.initialContacts(NetworkUtility.CHAT_ROOM_SYSTEM_NAME,
+                                NetworkUtility.CHAT_ROOM_FIRST_PORT))), "client");
     }
 
     private Route createRoute() {
-        return route(
-                path("chat", () -> route(
-                        post(() ->
-                                parameter(StringUnmarshallers.STRING, "name", name -> {
-                                    final Timeout timeout = Timeout.durationToTimeout(FiniteDuration.apply(10, TimeUnit.SECONDS));
-                                    // query the actor for the current auction state
-                                    CompletionStage<HttpResponse> httpResponseFuture = ask(client, new NewChatMessage(name), timeout).thenApply(
-                                            response -> {
-                                                if (response instanceof ChatCreatedMessage) {
-
-                                                    return HttpResponse.create()
-                                                            .withStatus(StatusCodes.CREATED)
-                                                            .withEntity(((ChatCreatedMessage) response).getId());
-                                                } else {
-                                                    return HttpResponse.create()
-                                                            .withStatus(StatusCodes.CONFLICT)
-                                                            .withEntity("Name already taken");
-                                                }
-                                            }
-                                    );
-                                    return completeWithFuture(httpResponseFuture);
-                                })))));
+        return route(path("chat", () ->
+                path(segment(), (String id) -> route(
+                        post(() -> {
+                            final Timeout timeout = Timeout.durationToTimeout(
+                                    FiniteDuration.apply(10, TimeUnit.SECONDS));
+                            CompletionStage<HttpResponse> httpResponseFuture =
+                                    ask(client, new NewChatMessage(id), timeout).thenApply(
+                                    response -> {
+                                        if (response instanceof ChatCreatedMessage) {
+                                            return HttpResponse.create()
+                                                    .withStatus(StatusCodes.CREATED)
+                                                    .withEntity(((ChatCreatedMessage) response).getId());
+                                        } else {
+                                            return HttpResponse.create()
+                                                    .withStatus(StatusCodes.CONFLICT)
+                                                    .withEntity("Name already taken");
+                                        }
+                                    }
+                            );
+                            return completeWithFuture(httpResponseFuture);
+                        })))));
     }
 }
