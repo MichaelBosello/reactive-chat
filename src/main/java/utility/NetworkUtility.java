@@ -1,13 +1,14 @@
 package utility;
 
+import akka.actor.ActorPath;
+import akka.actor.ActorPaths;
 import akka.actor.Address;
 
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 public class NetworkUtility {
 
@@ -17,39 +18,27 @@ public class NetworkUtility {
     public final static int MESSAGE_MANAGER_FIRST_PORT = 2851;
     public final static int BROKER_FIRST_PORT = 2951;
 
-    public final static int CHATSERVICE_CLIENT_PORT = 3551;
-    public final static int CHAT_ROOM_CLIENT_PORT = 3651;
-    public final static int REGISTRY_CLIENT_PORT = 3751;
-    public final static int MESSAGE_MANAGER_CLIENT_PORT = 3851;
-    public final static int BROKER_CLIENT_PORT = 3951;
+    public final static int CHAT_SERVICE_PORT = 8551;
+    public final static int CHAT_ROOM_MICROSERVICE_PORT = 8651;
+    public final static int REGISTRY_MICROSERVICE_PORT = 8751;
+    public final static int MESSAGE_MANAGER_MICROSERVICE_PORT = 8851;
+    public final static int BROKER_MICROSERVICE_PORT = 8951;
 
-    private static List<Address> getTwoClusterSeed(int port) {
+    public final static String CHAT_ROOM_SYSTEM_NAME = "ChatRoom";
+    public final static String CHAT_ROOM_SHARD_REGION_NAME = CHAT_ROOM_SYSTEM_NAME + "Shard";
+
+    public static List<Address> getTwoClusterSeed(String system, int port) {
         List<Address> list = new LinkedList<>();
-        list.add(new Address(getLanOrLocal(), String.valueOf(port)));
-        list.add(new Address(getLanOrLocal(), String.valueOf(port + 1)));
+        list.add(new Address("akka.tcp", system, getLanOrLocal(), port));
+        list.add(new Address("akka.tcp", system, getLanOrLocal(), port + 1));
         return list;
     }
 
-    public static List<Address> getChatClusterSeed() {
-        return getTwoClusterSeed(CHATSERVICE_FIRST_PORT);
+    public static Set<ActorPath> initialContacts(String system, int port) {
+        return new HashSet<ActorPath>(Arrays.asList(
+                ActorPaths.fromString("akka.tcp://" + system + "@" + getLanOrLocal() + ":" + port + "/system/receptionist"),
+                ActorPaths.fromString("akka.tcp://" + system + "@" + getLanOrLocal() + ":" + (port + 1) + "/system/receptionist")));
     }
-
-    public static List<Address> getChatRoomClusterSeed() {
-        return getTwoClusterSeed(CHAT_ROOM_FIRST_PORT);
-    }
-
-    public static List<Address> getRegistryClusterSeed() {
-        return getTwoClusterSeed(REGISTRY_FIRST_PORT);
-    }
-
-    public static List<Address> getMessageManagerClusterSeed() {
-        return getTwoClusterSeed(MESSAGE_MANAGER_FIRST_PORT);
-    }
-
-    public static List<Address> getBrokerClusterSeed() {
-        return getTwoClusterSeed(BROKER_FIRST_PORT);
-    }
-
 
     public static String getLANIP() {
         String ip = null;
@@ -71,16 +60,12 @@ public class NetworkUtility {
             try {
                 Socket clientSocket = new Socket(ip, port);
                 clientSocket.close();
-                System.out.println("Soket " + port + " already in use, try next one");
+                System.out.println("Socket " + port + " already in use, try next one");
                 port++;
             } catch (IOException e) {
                 portFound = true;
             }
         }
         return port;
-    }
-
-    public static String ipPortConcat(String ip, int port) {
-        return ip + ":" + port;
     }
 }

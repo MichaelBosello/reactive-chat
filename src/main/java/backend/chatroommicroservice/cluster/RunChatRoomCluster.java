@@ -26,12 +26,13 @@ public class RunChatRoomCluster {
                 ConfigFactory.parseString("akka.remote.netty.tcp.port=" + port + "\n" +
                         "akka.remote.netty.tcp.hostname=" + ip).withFallback(config);
 
-        ActorSystem system = ActorSystem.create("ChatRoom", portConfig);
+        ActorSystem system = ActorSystem.create(NetworkUtility.CHAT_ROOM_SYSTEM_NAME, portConfig);
         final Cluster cluster = Cluster.get(system);
-        cluster.joinSeedNodes(NetworkUtility.getChatRoomClusterSeed());
+        cluster.joinSeedNodes(NetworkUtility.getTwoClusterSeed(
+                NetworkUtility.CHAT_ROOM_SYSTEM_NAME, NetworkUtility.CHAT_ROOM_FIRST_PORT));
 
         ClusterShardingSettings settings = ClusterShardingSettings.create(system);
-        ActorRef shardRegion = ClusterSharding.get(system).start("ChatroomShard",
+        ActorRef shardRegion = ClusterSharding.get(system).start(NetworkUtility.CHAT_ROOM_SHARD_REGION_NAME,
                 Props.create(ChatRoomActor.class), settings, new ChatRoomShardExtractor());
 
         ClusterClientReceptionist.get(system).registerService(shardRegion);
