@@ -8,7 +8,6 @@ import akka.persistence.SnapshotOffer;
 import backend.chatroommicroservice.message.ChatAlreadyExistMessage;
 import backend.chatroommicroservice.message.ChatCreatedMessage;
 import backend.chatroommicroservice.state.ChatRoomState;
-import backend.chatroommicroservice.state.DeleteChatEvent;
 import backend.chatroommicroservice.state.NewChatEvent;
 import backend.chatroommicroservice.message.NewChatMessage;
 
@@ -32,7 +31,6 @@ public class ChatRoomActor extends AbstractPersistentActor {
     public Receive createReceiveRecover() {
         return receiveBuilder()
                 .match(NewChatEvent.class, state::update)
-                .match(DeleteChatEvent.class, state::update)
                 .match(SnapshotOffer.class, snapshotOffer -> state = (ChatRoomState) snapshotOffer.snapshot())
                 .matchEquals(ReceiveTimeout.getInstance(), msg -> passivate())
                 .build();
