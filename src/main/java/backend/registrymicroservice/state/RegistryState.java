@@ -24,7 +24,7 @@ public class RegistryState implements Serializable {
 
     public void update(AddUserEvent event) {
         if (roomList.containsKey(event.getChatId())) {
-            Set room = new HashSet();
+            Set<Integer> room = new HashSet<>();
             room.add(event.getUserId());
             roomList.put(event.getChatId(), room);
         } else {
