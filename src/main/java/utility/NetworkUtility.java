@@ -18,6 +18,10 @@ public class NetworkUtility {
     public final static int MESSAGE_MANAGER_FIRST_PORT = 2851;
     public final static int BROKER_FIRST_PORT = 2951;
 
+    public final static int CLIENT_CHAT_BASE_PORT = 3001;
+
+    public final static int CHAT_ROOM_CLIENT_PORT = 5651;
+
     public final static int CHAT_SERVICE_PORT = 8551;
     public final static int CHAT_ROOM_MICROSERVICE_PORT = 8651;
     public final static int REGISTRY_MICROSERVICE_PORT = 8751;

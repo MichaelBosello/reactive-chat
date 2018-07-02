@@ -24,7 +24,7 @@ public class ChatRoomActor extends AbstractPersistentActor {
     @Override
     public void preStart() throws Exception {
         super.preStart();
-        getContext().setReceiveTimeout(Duration.ofSeconds(120));
+        getContext().setReceiveTimeout(Duration.ofSeconds(600));
     }
 
     @Override

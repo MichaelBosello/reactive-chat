@@ -10,6 +10,7 @@ import akka.http.javadsl.ServerBinding;
 import akka.http.javadsl.model.HttpRequest;
 import akka.http.javadsl.model.HttpResponse;
 import akka.http.javadsl.model.StatusCodes;
+import akka.http.javadsl.model.headers.Location;
 import akka.http.javadsl.server.AllDirectives;
 import akka.http.javadsl.server.Route;
 import akka.stream.ActorMaterializer;
@@ -32,11 +33,12 @@ import java.io.File;
 
 public class RunChatRoomMicroservice extends AllDirectives {
 
+    private static String chatServiceUrl;
     private final ActorRef client;
 
     public static void main(String[] args) throws Exception {
         String ip = NetworkUtility.getLanOrLocal();
-        int port = NetworkUtility.findNextAviablePort(ip, NetworkUtility.CHAT_ROOM_MICROSERVICE_PORT);
+        int port = NetworkUtility.findNextAviablePort(ip, NetworkUtility.CHAT_ROOM_CLIENT_PORT);
         System.out.println("Try connection on " + ip + ":" + port);
         Config config = ConfigFactory.parseFile(new File("src/main/resources/min-remote.conf"));
         Config portConfig =
@@ -50,11 +52,14 @@ public class RunChatRoomMicroservice extends AllDirectives {
         //In order to access all directives we need an instance where the routes are define.
         RunChatRoomMicroservice app = new RunChatRoomMicroservice(system);
 
+        int serverPort = NetworkUtility.findNextAviablePort(ip, NetworkUtility.CHAT_ROOM_MICROSERVICE_PORT);
+        chatServiceUrl = "http://" + ip + ":" + serverPort;
+
         final Flow<HttpRequest, HttpResponse, NotUsed> routeFlow = app.createRoute().flow(system, materializer);
         final CompletionStage<ServerBinding> binding = http.bindAndHandle(routeFlow,
-                ConnectHttp.toHost(ip, port), materializer);
+                ConnectHttp.toHost(ip, serverPort), materializer);
 
-        System.out.println("Server online at http://" + ip + ":" + port + "/\nPress RETURN to stop...");
+        System.out.println("Server online at " + chatServiceUrl + "/\nPress RETURN to stop...");
         System.in.read(); // let it run until user presses return
 
         binding
@@ -71,25 +76,51 @@ public class RunChatRoomMicroservice extends AllDirectives {
 
     private Route createRoute() {
         return route(path("chat", () ->
-                path(segment(), (String id) -> route(
+        post( () -> {
+            final Timeout timeout = Timeout.durationToTimeout(
+                    FiniteDuration.apply(10, TimeUnit.SECONDS));
+            CompletionStage<HttpResponse> httpResponseFuture =
+                    ask(client, new ClusterClient.Send("/system/sharding/ChatRoomShard", new NewChatMessage("fio"), true), timeout).thenApply(
+                            response -> {
+                                Location locationHeader = Location.create(chatServiceUrl + "/fio");
+                                if (response instanceof ChatCreatedMessage) {
+                                    return HttpResponse.create()
+                                            .withStatus(StatusCodes.CREATED)
+                                            .addHeader(locationHeader)
+                                            .withEntity(((ChatCreatedMessage) response).getId());
+                                } else {
+                                    return HttpResponse.create()
+                                            .withStatus(StatusCodes.CONFLICT)
+                                            .addHeader(locationHeader)
+                                            .withEntity("Name already taken");
+                                }
+                            }
+                    );
+            return completeWithFuture(httpResponseFuture);
+        })));
+                /*path(segment(), (String id) -> route(
                         post(() -> {
+                            System.out.println("request received");
                             final Timeout timeout = Timeout.durationToTimeout(
                                     FiniteDuration.apply(10, TimeUnit.SECONDS));
                             CompletionStage<HttpResponse> httpResponseFuture =
                                     ask(client, new NewChatMessage(id), timeout).thenApply(
                                     response -> {
+                                        Location locationHeader = Location.create(chatServiceUrl + "/" + id);
                                         if (response instanceof ChatCreatedMessage) {
                                             return HttpResponse.create()
                                                     .withStatus(StatusCodes.CREATED)
+                                                    .addHeader(locationHeader)
                                                     .withEntity(((ChatCreatedMessage) response).getId());
                                         } else {
                                             return HttpResponse.create()
                                                     .withStatus(StatusCodes.CONFLICT)
+                                                    .addHeader(locationHeader)
                                                     .withEntity("Name already taken");
                                         }
                                     }
                             );
                             return completeWithFuture(httpResponseFuture);
-                        })))));
+                        })))));*/
     }
 }

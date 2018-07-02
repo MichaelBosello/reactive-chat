@@ -5,6 +5,7 @@ import akka.cluster.Cluster;
 import akka.cluster.client.ClusterClientReceptionist;
 import akka.cluster.sharding.ClusterSharding;
 import akka.cluster.sharding.ClusterShardingSettings;
+import akka.persistence.cassandra.testkit.CassandraLauncher;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import utility.NetworkUtility;
@@ -13,7 +14,13 @@ import java.io.File;
 
 public class RunChatRoomCluster {
 
+    private final static int CASSANDRA_PORT = 9042;
+
     public static void main(String[] args) {
+        if(NetworkUtility.findNextAviablePort("localhost", CASSANDRA_PORT) == CASSANDRA_PORT) {
+            File cassandraDirectory = new File("target/customer");
+            CassandraLauncher.start(cassandraDirectory, CassandraLauncher.DefaultTestConfigResource(), true, CASSANDRA_PORT);
+        }
         deployChatRoomActor();
     }
 
