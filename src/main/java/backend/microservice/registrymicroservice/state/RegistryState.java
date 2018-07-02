@@ -1,4 +1,4 @@
-package backend.registrymicroservice.state;
+package backend.microservice.registrymicroservice.state;
 
 import java.io.Serializable;
 import java.util.HashMap;

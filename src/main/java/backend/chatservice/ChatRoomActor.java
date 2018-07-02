@@ -1,15 +1,15 @@
-package backend.chatroommicroservice.cluster;
+package backend.chatservice;
 
 import akka.actor.PoisonPill;
 import akka.actor.ReceiveTimeout;
 import akka.cluster.sharding.ShardRegion;
 import akka.persistence.AbstractPersistentActor;
 import akka.persistence.SnapshotOffer;
-import backend.chatroommicroservice.cluster.message.ChatAlreadyExistMessage;
-import backend.chatroommicroservice.cluster.message.ChatCreatedMessage;
-import backend.chatroommicroservice.cluster.state.ChatRoomState;
-import backend.chatroommicroservice.cluster.state.NewChatEvent;
-import backend.chatroommicroservice.cluster.message.NewChatMessage;
+import backend.chatservice.message.ChatAlreadyExistMessage;
+import backend.chatservice.message.ChatCreatedMessage;
+import backend.chatservice.state.ChatRoomState;
+import backend.chatservice.state.NewChatEvent;
+import backend.chatservice.message.NewChatMessage;
 
 import java.time.Duration;
 

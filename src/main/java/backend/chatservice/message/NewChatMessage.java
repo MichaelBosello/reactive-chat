@@ -1,12 +1,12 @@
-package backend.chatroommicroservice.cluster.state;
+package backend.chatservice.message;
 
 import java.io.Serializable;
 
-public class NewChatEvent implements Serializable {
+public class NewChatMessage implements Serializable {
     private static final long serialVersionUID = 1L;
     private final String id;
 
-    public NewChatEvent(String id) {
+    public NewChatMessage(String id) {
         this.id = id;
     }
 

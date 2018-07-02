@@ -1,4 +1,4 @@
-package backend.chatroommicroservice.cluster.message;
+package backend.chatservice.message;
 
 import java.io.Serializable;
 

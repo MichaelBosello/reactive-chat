@@ -1,7 +1,7 @@
-package backend.chatroommicroservice.cluster;
+package backend.chatservice;
 
 import akka.cluster.sharding.ShardRegion;
-import backend.chatroommicroservice.cluster.message.NewChatMessage;
+import backend.chatservice.message.NewChatMessage;
 
 public class ChatRoomShardExtractor implements ShardRegion.MessageExtractor {
 

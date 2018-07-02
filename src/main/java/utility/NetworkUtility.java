@@ -12,24 +12,25 @@ import java.util.*;
 
 public class NetworkUtility {
 
-    public final static int CHATSERVICE_FIRST_PORT = 2551;
-    public final static int CHAT_ROOM_FIRST_PORT = 2651;
+    public final static int CHAT_SERVICE_FIRST_PORT = 2551;
     public final static int REGISTRY_FIRST_PORT = 2751;
     public final static int MESSAGE_MANAGER_FIRST_PORT = 2851;
     public final static int BROKER_FIRST_PORT = 2951;
 
     public final static int CLIENT_CHAT_BASE_PORT = 3001;
 
-    public final static int CHAT_ROOM_CLIENT_PORT = 5651;
+    public final static int CHAT_SERVICE_CLIENT_PORT = 5651;
+    public final static int REGISTRY_CLIENT_PORT = 5751;
+    public final static int MESSAGE_MANAGER_CLIENT_PORT = 5851;
+    public final static int BROKER_CLIENT_PORT = 5951;
 
     public final static int CHAT_SERVICE_PORT = 8551;
-    public final static int CHAT_ROOM_MICROSERVICE_PORT = 8651;
     public final static int REGISTRY_MICROSERVICE_PORT = 8751;
     public final static int MESSAGE_MANAGER_MICROSERVICE_PORT = 8851;
     public final static int BROKER_MICROSERVICE_PORT = 8951;
 
-    public final static String CHAT_ROOM_SYSTEM_NAME = "ChatRoom";
-    public final static String CHAT_ROOM_SHARD_REGION_NAME = CHAT_ROOM_SYSTEM_NAME + "Shard";
+    public final static String CHAT_SERVICE_SYSTEM_NAME = "ChatRoom";
+    public final static String CHAT_SERVICE_SHARD_REGION_NAME = CHAT_SERVICE_SYSTEM_NAME + "Shard";
 
     public static List<Address> getTwoClusterSeed(String system, int port) {
         List<Address> list = new LinkedList<>();

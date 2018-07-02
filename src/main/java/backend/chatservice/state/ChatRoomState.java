@@ -1,4 +1,4 @@
-package backend.chatroommicroservice.cluster.state;
+package backend.chatservice.state;
 
 import java.io.Serializable;
 import java.util.ArrayList;

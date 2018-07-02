@@ -1,11 +1,11 @@
-package backend.registrymicroservice;
+package backend.microservice.registrymicroservice;
 
 import akka.persistence.AbstractPersistentActor;
 import akka.persistence.SnapshotOffer;
-import backend.registrymicroservice.message.AddUserMessage;
-import backend.registrymicroservice.state.AddUserEvent;
-import backend.registrymicroservice.state.RegistryState;
-import backend.registrymicroservice.state.RemoveUserEvent;
+import backend.microservice.registrymicroservice.message.AddUserMessage;
+import backend.microservice.registrymicroservice.state.AddUserEvent;
+import backend.microservice.registrymicroservice.state.RegistryState;
+import backend.microservice.registrymicroservice.state.RemoveUserEvent;
 
 public class RegistryActor extends AbstractPersistentActor {
 
