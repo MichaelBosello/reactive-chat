@@ -4,13 +4,13 @@ import java.io.Serializable;
 
 public class NewChatRequestMessage implements Serializable {
 
-    private final String host;
+    private final String name;
 
-    public NewChatRequestMessage(String host) {
-        this.host = host;
+    public NewChatRequestMessage(String name) {
+        this.name = name;
     }
 
-    public String getHost() {
-        return host;
+    public String getName() {
+        return name;
     }
 }

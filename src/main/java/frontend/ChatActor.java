@@ -4,6 +4,7 @@ import akka.actor.*;
 import akka.http.javadsl.Http;
 import akka.http.javadsl.model.HttpRequest;
 import akka.http.javadsl.model.HttpResponse;
+import akka.http.javadsl.model.StatusCodes;
 import frontend.chatgui.ChatGUIActor;
 import frontend.message.*;
 import scala.concurrent.ExecutionContextExecutor;
@@ -29,11 +30,11 @@ public class ChatActor extends AbstractActorWithStash {
     public Receive createReceive() {
         return receiveBuilder()
                 .match(ConnectRequestMessage.class, req -> {
-                    pipe(fetch(chatServiceURL + "/chat/" + req.getName()), dispatcher).to(self());
+
                 }).match(LeaveRequestMessage.class, req -> {
 
                 }).match(NewChatRequestMessage.class, req -> {
-
+                    pipe(fetch(chatServiceURL + "/chat/" + req.getName()), dispatcher).to(self());
                 }).match(SendMessage.class, msg -> {
 
                 }).match(HttpResponse.class, response -> {
@@ -43,7 +44,12 @@ public class ChatActor extends AbstractActorWithStash {
                         } else if (response.getHeader("Location").toString().contains("/message/")) {
 
                         } else {
-                            gui.tell(new NewChatResponseMessage(response.status().isFailure(), response.entity().toString()), getSelf());
+                            boolean success = false;
+                            if(response.status().intValue() == StatusCodes.CREATED.intValue()){
+                                success = true;
+                            }
+                            String responseBody = response.entity().toString().substring(44, response.entity().toString().length() -1);
+                            gui.tell(new NewChatResponseMessage(success, responseBody), getSelf());
                         }
                     }
                 })

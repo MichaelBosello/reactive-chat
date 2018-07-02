@@ -110,7 +110,7 @@ public class DChatGUI extends JFrame implements ChatGUI {
 
     @Override
     public void newChatCreated() {
-        JOptionPane.showMessageDialog(null, "", "Room created and ready to join", JOptionPane.INFORMATION_MESSAGE);
+        JOptionPane.showMessageDialog(null, "Room created and ready to join", "", JOptionPane.INFORMATION_MESSAGE);
         joinButton.setEnabled(true);
     }
 

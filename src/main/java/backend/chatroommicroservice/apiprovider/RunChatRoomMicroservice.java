@@ -75,14 +75,15 @@ public class RunChatRoomMicroservice extends AllDirectives {
     }
 
     private Route createRoute() {
-        return route(path("chat", () ->
+        return route(pathPrefix("chat", () ->
+                path(segment(), (String id) -> route(
         post( () -> {
             final Timeout timeout = Timeout.durationToTimeout(
                     FiniteDuration.apply(10, TimeUnit.SECONDS));
             CompletionStage<HttpResponse> httpResponseFuture =
-                    ask(client, new ClusterClient.Send("/system/sharding/ChatRoomShard", new NewChatMessage("fio"), true), timeout).thenApply(
+                    ask(client, new ClusterClient.Send("/system/sharding/ChatRoomShard", new NewChatMessage(id), true), timeout).thenApply(
                             response -> {
-                                Location locationHeader = Location.create(chatServiceUrl + "/fio");
+                                Location locationHeader = Location.create(chatServiceUrl + "/" + id);
                                 if (response instanceof ChatCreatedMessage) {
                                     return HttpResponse.create()
                                             .withStatus(StatusCodes.CREATED)
@@ -97,7 +98,7 @@ public class RunChatRoomMicroservice extends AllDirectives {
                             }
                     );
             return completeWithFuture(httpResponseFuture);
-        })));
+        })))));
                 /*path(segment(), (String id) -> route(
                         post(() -> {
                             System.out.println("request received");
