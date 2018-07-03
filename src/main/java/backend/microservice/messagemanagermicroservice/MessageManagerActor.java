@@ -8,6 +8,7 @@ import akka.http.javadsl.model.HttpEntities;
 import akka.http.javadsl.model.HttpRequest;
 import backend.microservice.messagemanagermicroservice.data.UserMessage;
 import backend.microservice.messagemanagermicroservice.message.NewMessage;
+import backend.microservice.registrymicroservice.message.SuccessMessage;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import scala.concurrent.ExecutionContextExecutor;
@@ -62,6 +63,7 @@ public class MessageManagerActor extends AbstractActor {
                                                 ContentTypes.APPLICATION_JSON, messageJson)))
                                 , dispatcher).to(self());
                     }
+                    getSender().tell(new SuccessMessage(), getSelf());
                 }).match(ReceiveTimeout.class, timeout -> {
                     inCS = false;
                     getContext().setReceiveTimeout(Duration.Undefined());
