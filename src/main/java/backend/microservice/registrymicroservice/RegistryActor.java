@@ -31,7 +31,7 @@ public class RegistryActor extends AbstractPersistentActor {
                     final AddUserEvent evt = new AddUserEvent(msg.getChatId(), msg.getUserId());
                     persist(evt, (AddUserEvent e) -> {
                         state.update(e);
-                        getSender().tell(new SuccessMessage(msg.getChatId(), msg.getChatId()), getSelf());
+                        getSender().tell(new SuccessMessage(), getSelf());
                         getContext().getSystem().eventStream().publish(e);
                         if (lastSequenceNr() % snapShotInterval == 0 && lastSequenceNr() != 0)
                             // IMPORTANT: create a copy of snapshot because ExampleState is mutable
@@ -41,7 +41,7 @@ public class RegistryActor extends AbstractPersistentActor {
                     final RemoveUserEvent evt = new RemoveUserEvent(msg.getChatId(), msg.getUserId());
                     persist(evt, (RemoveUserEvent e) -> {
                         state.update(e);
-                        getSender().tell(new SuccessMessage(msg.getChatId(), msg.getChatId()), getSelf());
+                        getSender().tell(new SuccessMessage(), getSelf());
                         getContext().getSystem().eventStream().publish(e);
                         if (lastSequenceNr() % snapShotInterval == 0 && lastSequenceNr() != 0)
                             // IMPORTANT: create a copy of snapshot because ExampleState is mutable

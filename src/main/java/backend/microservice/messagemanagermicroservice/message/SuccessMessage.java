@@ -1,4 +1,4 @@
-package backend.microservice.registrymicroservice.message;
+package backend.microservice.messagemanagermicroservice.message;
 
 import java.io.Serializable;
 

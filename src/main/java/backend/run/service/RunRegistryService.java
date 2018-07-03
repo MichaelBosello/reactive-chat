@@ -81,16 +81,18 @@ public class RunRegistryService extends AllDirectives {
     private Route createRoute() {
         return route(pathPrefix("chats", () ->
                 path(segment(), (String chatId) ->
-                        route(
+                        pathPrefix("users", () -> route(
                                 get(() -> {
                                     final Timeout timeout = Timeout.durationToTimeout(
                                             FiniteDuration.apply(10, TimeUnit.SECONDS));
                                     CompletionStage<HttpResponse> httpResponseFuture =
                                             ask(client, new ClusterClient.Send("/system/sharding/" +
-                                                            NetworkUtility.REGISTRY_SHARD_REGION_NAME, new GetUsersMessage(chatId), true),
+                                                            NetworkUtility.REGISTRY_SHARD_REGION_NAME,
+                                                            new GetUsersMessage(chatId), true),
                                                     timeout).thenApply(
                                                     response -> {
-                                                        Location locationHeader = Location.create(registryMicroserviceUrl + "/chats/" + chatId + "/users");
+                                                        Location locationHeader = Location.create(
+                                                                registryMicroserviceUrl + "/chats/" + chatId + "/users");
                                                         UserList users = new UserList(((UserListMessage) response).getUsers());
                                                         String usersJson = "";
                                                         try {
@@ -101,46 +103,49 @@ public class RunRegistryService extends AllDirectives {
                                                         return HttpResponse.create()
                                                                 .withStatus(StatusCodes.OK)
                                                                 .addHeader(locationHeader)
-                                                                .withEntity(
-                                                                        HttpEntities.create(ContentTypes.APPLICATION_JSON, usersJson));
+                                                                .withEntity(HttpEntities.create(
+                                                                        ContentTypes.APPLICATION_JSON, usersJson));
                                                     }
                                             );
                                     return completeWithFuture(httpResponseFuture);
                                 }),
-                                pathPrefix("users", () ->
-                                        path(segment(), (String userId) ->
-                                                route(
-                                                        post(() -> {
-                                                            final Timeout timeout = Timeout.durationToTimeout(
-                                                                    FiniteDuration.apply(10, TimeUnit.SECONDS));
-                                                            CompletionStage<HttpResponse> httpResponseFuture =
-                                                                    ask(client, new ClusterClient.Send("/system/sharding/" +
-                                                                                    NetworkUtility.REGISTRY_SHARD_REGION_NAME, new AddUserMessage(chatId, userId), true),
-                                                                            timeout).thenApply(
-                                                                            response -> {
-                                                                                Location locationHeader = Location.create(registryMicroserviceUrl + "/chats/" + chatId + "/users/" + userId);
-                                                                                return HttpResponse.create()
-                                                                                        .withStatus(StatusCodes.CREATED)
-                                                                                        .addHeader(locationHeader);
-                                                                            }
-                                                                    );
-                                                            return completeWithFuture(httpResponseFuture);
-                                                        }),
-                                                        delete(() -> {
-                                                            final Timeout timeout = Timeout.durationToTimeout(
-                                                                    FiniteDuration.apply(10, TimeUnit.SECONDS));
-                                                            CompletionStage<HttpResponse> httpResponseFuture =
-                                                                    ask(client, new ClusterClient.Send("/system/sharding/" +
-                                                                                    NetworkUtility.REGISTRY_SHARD_REGION_NAME, new RemoveUserMessage(chatId, userId), true),
-                                                                            timeout).thenApply(
-                                                                            response -> {
-                                                                                Location locationHeader = Location.create(registryMicroserviceUrl + "/chats/" + chatId + "/users/" + userId);
-                                                                                return HttpResponse.create()
-                                                                                        .withStatus(StatusCodes.CREATED)
-                                                                                        .addHeader(locationHeader);
-                                                                            }
-                                                                    );
-                                                            return completeWithFuture(httpResponseFuture);
-                                                        }))))))));
+
+                                path(segment(), (String userId) -> route(
+                                        post(() -> {
+                                            final Timeout timeout = Timeout.durationToTimeout(
+                                                    FiniteDuration.apply(10, TimeUnit.SECONDS));
+                                            CompletionStage<HttpResponse> httpResponseFuture =
+                                                    ask(client, new ClusterClient.Send("/system/sharding/" +
+                                                                    NetworkUtility.REGISTRY_SHARD_REGION_NAME,
+                                                                    new AddUserMessage(chatId, userId), true),
+                                                            timeout).thenApply(
+                                                            response -> {
+                                                                Location locationHeader = Location.create(
+                                                                        registryMicroserviceUrl + "/chats/" + chatId + "/users/" + userId);
+                                                                return HttpResponse.create()
+                                                                        .withStatus(StatusCodes.CREATED)
+                                                                        .addHeader(locationHeader);
+                                                            }
+                                                    );
+                                            return completeWithFuture(httpResponseFuture);
+                                        }),
+                                        delete(() -> {
+                                            final Timeout timeout = Timeout.durationToTimeout(
+                                                    FiniteDuration.apply(10, TimeUnit.SECONDS));
+                                            CompletionStage<HttpResponse> httpResponseFuture =
+                                                    ask(client, new ClusterClient.Send("/system/sharding/" +
+                                                                    NetworkUtility.REGISTRY_SHARD_REGION_NAME,
+                                                                    new RemoveUserMessage(chatId, userId), true),
+                                                            timeout).thenApply(
+                                                            response -> {
+                                                                Location locationHeader = Location.create(
+                                                                        registryMicroserviceUrl + "/chats/" + chatId + "/users/" + userId);
+                                                                return HttpResponse.create()
+                                                                        .withStatus(StatusCodes.CREATED)
+                                                                        .addHeader(locationHeader);
+                                                            }
+                                                    );
+                                            return completeWithFuture(httpResponseFuture);
+                                        }))))))));
     }
 }
