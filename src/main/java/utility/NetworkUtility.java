@@ -38,17 +38,17 @@ public class NetworkUtility {
     public final static String BROKER_SYSTEM_NAME = "Broker";
     public final static String BROKER_SHARD_REGION_NAME = BROKER_SYSTEM_NAME + "Shard";
 
-    public static List<Address> getTwoClusterSeed(String system, int port) {
+    public static List<Address> getClusterSeed(String system, int port) {
         List<Address> list = new LinkedList<>();
         list.add(new Address("akka.tcp", system, getLanOrLocal(), port));
-        list.add(new Address("akka.tcp", system, getLanOrLocal(), port + 1));
+        //list.add(new Address("akka.tcp", system, getLanOrLocal(), port + 1));
         return list;
     }
 
     public static Set<ActorPath> initialContacts(String system, int port) {
         return new HashSet<ActorPath>(Arrays.asList(
-                ActorPaths.fromString("akka.tcp://" + system + "@" + getLanOrLocal() + ":" + port + "/system/receptionist"),
-                ActorPaths.fromString("akka.tcp://" + system + "@" + getLanOrLocal() + ":" + (port + 1) + "/system/receptionist")));
+                ActorPaths.fromString("akka.tcp://" + system + "@" + getLanOrLocal() + ":" + port + "/system/receptionist")));/*,
+                ActorPaths.fromString("akka.tcp://" + system + "@" + getLanOrLocal() + ":" + (port + 1) + "/system/receptionist")));*/
     }
 
     public static String getLANIP() {

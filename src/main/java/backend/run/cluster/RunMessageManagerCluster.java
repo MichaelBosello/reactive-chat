@@ -39,7 +39,7 @@ public class RunMessageManagerCluster {
 
         ActorSystem system = ActorSystem.create(NetworkUtility.MESSAGE_MANAGER_SYSTEM_NAME, portConfig);
         final Cluster cluster = Cluster.get(system);
-        cluster.joinSeedNodes(NetworkUtility.getTwoClusterSeed(
+        cluster.joinSeedNodes(NetworkUtility.getClusterSeed(
                 NetworkUtility.MESSAGE_MANAGER_SYSTEM_NAME, NetworkUtility.MESSAGE_MANAGER_FIRST_PORT));
 
         ClusterShardingSettings settings = ClusterShardingSettings.create(system);

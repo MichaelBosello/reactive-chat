@@ -37,7 +37,7 @@ public class RunChatCluster {
 
         ActorSystem system = ActorSystem.create(NetworkUtility.CHAT_SERVICE_SYSTEM_NAME, portConfig);
         final Cluster cluster = Cluster.get(system);
-        cluster.joinSeedNodes(NetworkUtility.getTwoClusterSeed(
+        cluster.joinSeedNodes(NetworkUtility.getClusterSeed(
                 NetworkUtility.CHAT_SERVICE_SYSTEM_NAME, NetworkUtility.CHAT_SERVICE_FIRST_PORT));
 
         ClusterShardingSettings settings = ClusterShardingSettings.create(system);
