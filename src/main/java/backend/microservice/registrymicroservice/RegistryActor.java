@@ -1,13 +1,13 @@
 package backend.microservice.registrymicroservice;
 
-import akka.persistence.AbstractPersistentActorWithAtLeastOnceDelivery;
+import akka.persistence.AbstractPersistentActor;
 import akka.persistence.SnapshotOffer;
 import backend.microservice.registrymicroservice.message.*;
 import backend.microservice.registrymicroservice.state.AddUserEvent;
 import backend.microservice.registrymicroservice.state.RegistryState;
 import backend.microservice.registrymicroservice.state.RemoveUserEvent;
 
-public class RegistryActor extends AbstractPersistentActorWithAtLeastOnceDelivery {
+public class RegistryActor extends AbstractPersistentActor {
 
     private RegistryState state = new RegistryState();
     private int snapShotInterval = 1000;
