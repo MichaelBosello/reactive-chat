@@ -4,19 +4,19 @@ import java.io.Serializable;
 
 public class RemoveUserEvent implements Serializable {
     private static final long serialVersionUID = 1L;
-    private final int chatId;
-    private final int userId;
+    private final String chatId;
+    private final String userId;
 
-    public RemoveUserEvent(int chatId, int userId) {
+    public RemoveUserEvent(String chatId, String userId) {
         this.chatId = chatId;
         this.userId = userId;
     }
 
-    public int getChatId() {
+    public String getChatId() {
         return chatId;
     }
 
-    public int getUserId() {
+    public String getUserId() {
         return userId;
     }
 }

@@ -4,20 +4,20 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ChatRoomState implements Serializable {
+public class ChatState implements Serializable {
     private static final long serialVersionUID = 1L;
     private final List<String> events;
 
-    public ChatRoomState() {
+    public ChatState() {
         this(new ArrayList<>());
     }
 
-    public ChatRoomState(List<String> events) {
+    public ChatState(List<String> events) {
         this.events = events;
     }
 
-    public ChatRoomState copy() {
-        return new ChatRoomState(new ArrayList<>(events));
+    public ChatState copy() {
+        return new ChatState(new ArrayList<>(events));
     }
 
     public void update(NewChatEvent event) {

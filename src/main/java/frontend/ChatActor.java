@@ -10,13 +10,11 @@ import frontend.message.*;
 import scala.concurrent.ExecutionContextExecutor;
 import utility.NetworkUtility;
 
-import java.util.concurrent.CompletionStage;
-
 import static akka.pattern.PatternsCS.pipe;
 
 public class ChatActor extends AbstractActorWithStash {
 
-    private String chatServiceURL = "http://" + NetworkUtility.getLanOrLocal() + ":" + NetworkUtility.CHAT_ROOM_MICROSERVICE_PORT;
+    private String chatServiceURL = "http://" + NetworkUtility.getLanOrLocal() + ":" + NetworkUtility.CHAT_SERVICE_PORT;
     private final ActorRef gui;
 
     final Http http = Http.get(context().system());
@@ -34,14 +32,16 @@ public class ChatActor extends AbstractActorWithStash {
                 }).match(LeaveRequestMessage.class, req -> {
 
                 }).match(NewChatRequestMessage.class, req -> {
-                    pipe(fetch(chatServiceURL + "/chat/" + req.getName()), dispatcher).to(self());
+                    pipe(
+                        http.singleRequest(HttpRequest.POST(chatServiceURL + "/chats/" + req.getName()))
+                        , dispatcher).to(self());
                 }).match(SendMessage.class, msg -> {
 
                 }).match(HttpResponse.class, response -> {
                     if (response.getHeader("Location").isPresent()) {
-                        if (response.getHeader("Location").toString().contains("/user/")) {
+                        if (response.getHeader("Location").toString().contains("/users/")) {
 
-                        } else if (response.getHeader("Location").toString().contains("/message/")) {
+                        } else if (response.getHeader("Location").toString().contains("/messages/")) {
 
                         } else {
                             boolean success = false;
@@ -56,7 +56,4 @@ public class ChatActor extends AbstractActorWithStash {
                 .build();
     }
 
-    CompletionStage<HttpResponse> fetch(String url) {
-        return http.singleRequest(HttpRequest.POST(url));
-    }
 }

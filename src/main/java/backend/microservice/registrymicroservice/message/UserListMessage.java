@@ -1,22 +1,23 @@
 package backend.microservice.registrymicroservice.message;
 
 import java.io.Serializable;
+import java.util.Set;
 
-public class RemoveUserMessage implements Serializable {
+public class UserListMessage implements Serializable {
     private static final long serialVersionUID = 1L;
     private final String chatId;
-    private final String userId;
+    private final Set<String> users;
 
-    public RemoveUserMessage(String chatId, String userId) {
+    public UserListMessage(String chatId, Set<String> users) {
         this.chatId = chatId;
-        this.userId = userId;
+        this.users = users;
     }
 
     public String getChatId() {
         return chatId;
     }
 
-    public String getUserId() {
-        return userId;
+    public Set<String> getUsers() {
+        return users;
     }
 }

@@ -31,6 +31,12 @@ public class NetworkUtility {
 
     public final static String CHAT_SERVICE_SYSTEM_NAME = "ChatRoom";
     public final static String CHAT_SERVICE_SHARD_REGION_NAME = CHAT_SERVICE_SYSTEM_NAME + "Shard";
+    public final static String REGISTRY_SYSTEM_NAME = "Registry";
+    public final static String REGISTRY_SHARD_REGION_NAME = CHAT_SERVICE_SYSTEM_NAME + "Shard";
+    public final static String MESSAGE_MANAGER_SYSTEM_NAME = "MessageManager";
+    public final static String MESSAGE_MANAGER_SHARD_REGION_NAME = MESSAGE_MANAGER_SYSTEM_NAME + "Shard";
+    public final static String BROKER_SYSTEM_NAME = "Broker";
+    public final static String BROKER_SHARD_REGION_NAME = BROKER_SYSTEM_NAME + "Shard";
 
     public static List<Address> getTwoClusterSeed(String system, int port) {
         List<Address> list = new LinkedList<>();

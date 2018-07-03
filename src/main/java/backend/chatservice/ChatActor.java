@@ -7,19 +7,19 @@ import akka.persistence.AbstractPersistentActor;
 import akka.persistence.SnapshotOffer;
 import backend.chatservice.message.ChatAlreadyExistMessage;
 import backend.chatservice.message.ChatCreatedMessage;
-import backend.chatservice.state.ChatRoomState;
+import backend.chatservice.state.ChatState;
 import backend.chatservice.state.NewChatEvent;
 import backend.chatservice.message.NewChatMessage;
 
 import java.time.Duration;
 
-public class ChatRoomActor extends AbstractPersistentActor {
+public class ChatActor extends AbstractPersistentActor {
 
-    private ChatRoomState state = new ChatRoomState();
+    private ChatState state = new ChatState();
     private static final int SNAP_SHOT_INTERVAL = 1000;
 
     @Override
-    public String persistenceId() { return "Room-" + getSelf().path().name(); }
+    public String persistenceId() { return "Chat-" + getSelf().path().name(); }
 
     @Override
     public void preStart() throws Exception {
@@ -31,7 +31,7 @@ public class ChatRoomActor extends AbstractPersistentActor {
     public Receive createReceiveRecover() {
         return receiveBuilder()
                 .match(NewChatEvent.class, state::update)
-                .match(SnapshotOffer.class, snapshotOffer -> state = (ChatRoomState) snapshotOffer.snapshot())
+                .match(SnapshotOffer.class, snapshotOffer -> state = (ChatState) snapshotOffer.snapshot())
                 .matchEquals(ReceiveTimeout.getInstance(), msg -> passivate())
                 .build();
     }

@@ -75,7 +75,7 @@ public class RunChatService extends AllDirectives {
     }
 
     private Route createRoute() {
-        return route(pathPrefix("chat", () ->
+        return route(pathPrefix("chats", () ->
                 path(segment(), (String id) -> route(
                         post(() -> {
                             final Timeout timeout = Timeout.durationToTimeout(
@@ -85,7 +85,7 @@ public class RunChatService extends AllDirectives {
                                                     NetworkUtility.CHAT_SERVICE_SHARD_REGION_NAME, new NewChatMessage(id), true),
                                             timeout).thenApply(
                                             response -> {
-                                                Location locationHeader = Location.create(chatServiceUrl + "/" + id);
+                                                Location locationHeader = Location.create(chatServiceUrl + "/chats/" + id);
                                                 if (response instanceof ChatCreatedMessage) {
                                                     return HttpResponse.create()
                                                             .withStatus(StatusCodes.CREATED)

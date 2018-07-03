@@ -3,24 +3,21 @@ package backend.chatservice;
 import akka.cluster.sharding.ShardRegion;
 import backend.chatservice.message.NewChatMessage;
 
-public class ChatRoomShardExtractor implements ShardRegion.MessageExtractor {
+public class ChatShardExtractor implements ShardRegion.MessageExtractor {
 
     private static final int NUMBER_OF_SHARDS = 100;
 
     @Override
     public String entityId(Object message) {
         if (message instanceof NewChatMessage)
-            return String.valueOf(((NewChatMessage) message).getId());
+            return ((NewChatMessage) message).getId();
         else
             return null;
     }
 
     @Override
     public Object entityMessage(Object message) {
-        if (message instanceof NewChatMessage)
-            return (message);
-        else
-            return null;
+        return message;
     }
 
     @Override

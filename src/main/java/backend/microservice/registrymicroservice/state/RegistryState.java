@@ -8,13 +8,13 @@ import java.util.Set;
 
 public class RegistryState implements Serializable {
     private static final long serialVersionUID = 1L;
-    private final Map<Integer, Set<Integer>> roomList;
+    private final Map<String, Set<String>> roomList;
 
     public RegistryState() {
         this(new HashMap<>());
     }
 
-    public RegistryState(HashMap<Integer, Set<Integer>> roomList) {
+    public RegistryState(HashMap<String, Set<String>> roomList) {
         this.roomList = roomList;
     }
 
@@ -24,7 +24,7 @@ public class RegistryState implements Serializable {
 
     public void update(AddUserEvent event) {
         if (roomList.containsKey(event.getChatId())) {
-            Set<Integer> room = new HashSet<>();
+            Set<String> room = new HashSet<>();
             room.add(event.getUserId());
             roomList.put(event.getChatId(), room);
         } else {
@@ -34,7 +34,12 @@ public class RegistryState implements Serializable {
     }
 
     public void update(RemoveUserEvent event) {
-        roomList.get(event.getUserId()).remove(event.getUserId());
+        if(roomList.get(event.getUserId()).contains(event.getUserId()))
+            roomList.get(event.getUserId()).remove(event.getUserId());
+    }
+
+    public Set<String> getUsers(String chatId){
+        return roomList.get(chatId);
     }
 
     public int size() {

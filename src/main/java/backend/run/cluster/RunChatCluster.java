@@ -6,15 +6,15 @@ import akka.cluster.client.ClusterClientReceptionist;
 import akka.cluster.sharding.ClusterSharding;
 import akka.cluster.sharding.ClusterShardingSettings;
 import akka.persistence.cassandra.testkit.CassandraLauncher;
-import backend.chatservice.ChatRoomActor;
-import backend.chatservice.ChatRoomShardExtractor;
+import backend.chatservice.ChatActor;
+import backend.chatservice.ChatShardExtractor;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import utility.NetworkUtility;
 
 import java.io.File;
 
-public class RunChatRoomCluster {
+public class RunChatCluster {
 
     private final static int CASSANDRA_PORT = 9042;
 
@@ -42,7 +42,7 @@ public class RunChatRoomCluster {
 
         ClusterShardingSettings settings = ClusterShardingSettings.create(system);
         ActorRef shardRegion = ClusterSharding.get(system).start(NetworkUtility.CHAT_SERVICE_SHARD_REGION_NAME,
-                Props.create(ChatRoomActor.class), settings, new ChatRoomShardExtractor());
+                Props.create(ChatActor.class), settings, new ChatShardExtractor());
 
         ClusterClientReceptionist.get(system).registerService(shardRegion);
 
