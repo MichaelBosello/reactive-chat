@@ -58,7 +58,7 @@ public class MessageManagerActor extends AbstractActor {
                         } catch (JsonProcessingException e) {
                             e.printStackTrace();
                         }
-                        pipe(http.singleRequest(HttpRequest.POST(brokerServiceURL + "/chats/" + msg.getChatId() + "/send")
+                        pipe(http.singleRequest(HttpRequest.POST(brokerServiceURL + "/chats/" + msg.getChatId() + "/send/")
                                         .withEntity(HttpEntities.create(
                                                 ContentTypes.APPLICATION_JSON, messageJson)))
                                 , dispatcher).to(self());

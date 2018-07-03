@@ -41,7 +41,7 @@ public class BrokerActor extends AbstractActor {
                     } else {
                         if (msg.isChatChanged() || !chatUsers.containsKey(msg.getChatId())) {
                             pipe(http.singleRequest(HttpRequest.GET(
-                                    RegistryServiceURL + "/chats/" + msg.getChatId() + "/users"))
+                                    RegistryServiceURL + "/chats/" + msg.getChatId() + "/users/"))
                                     , dispatcher).to(self());
                             waitingNewUserList.add(msg.getChatId());
                             toPendingList(msg);
@@ -78,7 +78,7 @@ public class BrokerActor extends AbstractActor {
 
     private void send(Set<String> users, String message){
         for (String user : users) {
-            http.singleRequest(HttpRequest.POST(user + "/nextmessage")
+            http.singleRequest(HttpRequest.POST(user + "/nextmessage/")
                     .withEntity(HttpEntities.create(
                             ContentTypes.TEXT_PLAIN_UTF8, message)));
         }

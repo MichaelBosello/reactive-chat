@@ -77,8 +77,8 @@ public class RunBrokerService extends AllDirectives {
 
     private Route createRoute() {
         return route(pathPrefix("chats", () ->
-                path(segment(), (String chatId) -> route(
-                        pathPrefix("send", () ->
+                pathPrefix(segment(), (String chatId) -> route(
+                        path("send", () ->
                                 post(() -> entity(Jackson.unmarshaller(UserMessage.class), userMessage -> {
                                     final Timeout timeout = Timeout.durationToTimeout(
                                             FiniteDuration.apply(10, TimeUnit.SECONDS));
@@ -90,7 +90,7 @@ public class RunBrokerService extends AllDirectives {
                                                     timeout).thenApply(
                                                     response -> {
                                                         Location locationHeader = Location.create(
-                                                                brokerMicroserviceUrl + "/chats/" + chatId + "/send");
+                                                                brokerMicroserviceUrl + "/chats/" + chatId + "/send/");
                                                         return HttpResponse.create()
                                                                 .withStatus(StatusCodes.OK)
                                                                 .addHeader(locationHeader);
