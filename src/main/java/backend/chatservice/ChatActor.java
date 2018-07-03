@@ -3,7 +3,7 @@ package backend.chatservice;
 import akka.actor.PoisonPill;
 import akka.actor.ReceiveTimeout;
 import akka.cluster.sharding.ShardRegion;
-import akka.persistence.AbstractPersistentActor;
+import akka.persistence.AbstractPersistentActorWithAtLeastOnceDelivery;
 import akka.persistence.SnapshotOffer;
 import backend.chatservice.message.ChatAlreadyExistMessage;
 import backend.chatservice.message.ChatCreatedMessage;
@@ -13,7 +13,7 @@ import backend.chatservice.message.NewChatMessage;
 
 import java.time.Duration;
 
-public class ChatActor extends AbstractPersistentActor {
+public class ChatActor extends AbstractPersistentActorWithAtLeastOnceDelivery {
 
     private ChatState state = new ChatState();
     private static final int SNAP_SHOT_INTERVAL = 1000;
