@@ -33,7 +33,7 @@ public class ChatClientActor extends AbstractActorWithStash {
 
                 }).match(NewChatRequestMessage.class, req -> {
                     pipe(
-                        http.singleRequest(HttpRequest.POST(chatServiceURL + "/chats/" + req.getName()))
+                        http.singleRequest(HttpRequest.POST(chatServiceURL + "/chats/" + req.getName() + "/"))
                         , dispatcher).to(self());
                 }).match(SendMessage.class, msg -> {
 

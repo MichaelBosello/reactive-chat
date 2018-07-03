@@ -7,6 +7,7 @@ import akka.cluster.client.ClusterClientSettings;
 import akka.http.javadsl.ConnectHttp;
 import akka.http.javadsl.Http;
 import akka.http.javadsl.ServerBinding;
+import akka.http.javadsl.marshallers.jackson.Jackson;
 import akka.http.javadsl.model.HttpRequest;
 import akka.http.javadsl.model.HttpResponse;
 import akka.http.javadsl.model.StatusCodes;
@@ -16,8 +17,11 @@ import akka.http.javadsl.server.Route;
 import akka.stream.ActorMaterializer;
 import akka.stream.javadsl.Flow;
 import akka.util.Timeout;
+import backend.chatservice.message.AddUserMessage;
 import backend.chatservice.message.ChatCreatedMessage;
 import backend.chatservice.message.NewChatMessage;
+import backend.chatservice.message.NewMessage;
+import backend.microservice.registrymicroservice.message.RemoveUserMessage;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import scala.concurrent.duration.FiniteDuration;
@@ -26,6 +30,7 @@ import utility.NetworkUtility;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.TimeUnit;
 
+import static akka.http.javadsl.server.PathMatchers.neutral;
 import static akka.pattern.PatternsCS.ask;
 import static akka.http.javadsl.server.PathMatchers.segment;
 
@@ -76,30 +81,89 @@ public class RunChatService extends AllDirectives {
 
     private Route createRoute() {
         return route(pathPrefix("chats", () ->
-                path(segment(), (String id) -> route(
-                        post(() -> {
-                            final Timeout timeout = Timeout.durationToTimeout(
-                                    FiniteDuration.apply(10, TimeUnit.SECONDS));
-                            CompletionStage<HttpResponse> httpResponseFuture =
-                                    ask(client, new ClusterClient.Send("/system/sharding/" +
-                                                    NetworkUtility.CHAT_SERVICE_SHARD_REGION_NAME, new NewChatMessage(id), true),
-                                            timeout).thenApply(
-                                            response -> {
-                                                Location locationHeader = Location.create(chatServiceUrl + "/chats/" + id);
-                                                if (response instanceof ChatCreatedMessage) {
-                                                    return HttpResponse.create()
-                                                            .withStatus(StatusCodes.CREATED)
-                                                            .addHeader(locationHeader)
-                                                            .withEntity(((ChatCreatedMessage) response).getId());
-                                                } else {
-                                                    return HttpResponse.create()
-                                                            .withStatus(StatusCodes.CONFLICT)
-                                                            .addHeader(locationHeader)
-                                                            .withEntity("Name already taken");
-                                                }
-                                            }
-                                    );
-                            return completeWithFuture(httpResponseFuture);
-                        })))));
+                pathPrefix(segment(), (String chatId) -> route(
+                        path(neutral(), () -> route(
+                                post(() -> {
+                                    final Timeout timeout = Timeout.durationToTimeout(
+                                            FiniteDuration.apply(10, TimeUnit.SECONDS));
+                                    CompletionStage<HttpResponse> httpResponseFuture =
+                                            ask(client, new ClusterClient.Send("/system/sharding/" +
+                                                            NetworkUtility.CHAT_SERVICE_SHARD_REGION_NAME,
+                                                            new NewChatMessage(chatId), true), timeout).thenApply(
+                                                    response -> {
+                                                        Location locationHeader = Location.create(chatServiceUrl + "/chats/" + chatId);
+                                                        if (response instanceof ChatCreatedMessage) {
+                                                            return HttpResponse.create()
+                                                                    .withStatus(StatusCodes.CREATED)
+                                                                    .addHeader(locationHeader)
+                                                                    .withEntity(((ChatCreatedMessage) response).getId());
+                                                        } else {
+                                                            return HttpResponse.create()
+                                                                    .withStatus(StatusCodes.CONFLICT)
+                                                                    .addHeader(locationHeader)
+                                                                    .withEntity("Name already taken");
+                                                        }
+                                                    }
+                                            );
+                                    return completeWithFuture(httpResponseFuture);
+                                }))),
+                        path("messages", () ->
+                                post(() -> entity(Jackson.unmarshaller(NewMessage.class), newMessage -> {
+                                    final Timeout timeout = Timeout.durationToTimeout(
+                                            FiniteDuration.apply(10, TimeUnit.SECONDS));
+                                    CompletionStage<HttpResponse> httpResponseFuture =
+                                            ask(client, new ClusterClient.Send("/system/sharding/" +
+                                                            NetworkUtility.CHAT_SERVICE_SHARD_REGION_NAME,
+                                                            new NewMessage(chatId, newMessage.getUserId(),
+                                                                    newMessage.getMessage()), true),
+                                                    timeout).thenApply(
+                                                    response -> {
+                                                        Location locationHeader = Location.create(
+                                                                chatServiceUrl + "/chats/" + chatId + "/messages/");
+                                                        return HttpResponse.create()
+                                                                .withStatus(StatusCodes.OK)
+                                                                .addHeader(locationHeader);
+                                                    }
+                                            );
+                                    return completeWithFuture(httpResponseFuture);
+                                }))),
+                        pathPrefix("users", () -> route(
+                                path(segment(), (String userId) -> route(
+                                        post(() -> {
+                                            final Timeout timeout = Timeout.durationToTimeout(
+                                                    FiniteDuration.apply(10, TimeUnit.SECONDS));
+                                            CompletionStage<HttpResponse> httpResponseFuture =
+                                                    ask(client, new ClusterClient.Send("/system/sharding/" +
+                                                                    NetworkUtility.CHAT_SERVICE_SHARD_REGION_NAME,
+                                                                    new AddUserMessage(chatId, userId), true),
+                                                            timeout).thenApply(
+                                                            response -> {
+                                                                Location locationHeader = Location.create(
+                                                                        chatServiceUrl + "/chats/" + chatId + "/users/" + userId);
+                                                                return HttpResponse.create()
+                                                                        .withStatus(StatusCodes.CREATED)
+                                                                        .addHeader(locationHeader);
+                                                            }
+                                                    );
+                                            return completeWithFuture(httpResponseFuture);
+                                        }),
+                                        delete(() -> {
+                                            final Timeout timeout = Timeout.durationToTimeout(
+                                                    FiniteDuration.apply(10, TimeUnit.SECONDS));
+                                            CompletionStage<HttpResponse> httpResponseFuture =
+                                                    ask(client, new ClusterClient.Send("/system/sharding/" +
+                                                                    NetworkUtility.CHAT_SERVICE_SHARD_REGION_NAME,
+                                                                    new RemoveUserMessage(chatId, userId), true),
+                                                            timeout).thenApply(
+                                                            response -> {
+                                                                Location locationHeader = Location.create(
+                                                                        chatServiceUrl + "/chats/" + chatId + "/users/" + userId);
+                                                                return HttpResponse.create()
+                                                                        .withStatus(StatusCodes.CREATED)
+                                                                        .addHeader(locationHeader);
+                                                            }
+                                                    );
+                                            return completeWithFuture(httpResponseFuture);
+                                        })))))))));
     }
 }
