@@ -8,8 +8,8 @@ import akka.cluster.client.ClusterClientReceptionist;
 import akka.cluster.sharding.ClusterSharding;
 import akka.cluster.sharding.ClusterShardingSettings;
 import akka.persistence.cassandra.testkit.CassandraLauncher;
-import backend.chatservice.ChatActor;
-import backend.chatservice.ChatShardExtractor;
+import backend.microservice.registrymicroservice.RegistryActor;
+import backend.microservice.registrymicroservice.RegistryShardExtractor;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import utility.NetworkUtility;
@@ -44,7 +44,7 @@ public class RunRegistryCluster {
 
         ClusterShardingSettings settings = ClusterShardingSettings.create(system);
         ActorRef shardRegion = ClusterSharding.get(system).start(NetworkUtility.REGISTRY_SHARD_REGION_NAME,
-                Props.create(ChatActor.class), settings, new ChatShardExtractor());
+                Props.create(RegistryActor.class), settings, new RegistryShardExtractor());
 
         ClusterClientReceptionist.get(system).registerService(shardRegion);
 

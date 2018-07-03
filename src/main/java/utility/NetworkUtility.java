@@ -32,7 +32,7 @@ public class NetworkUtility {
     public final static String CHAT_SERVICE_SYSTEM_NAME = "ChatRoom";
     public final static String CHAT_SERVICE_SHARD_REGION_NAME = CHAT_SERVICE_SYSTEM_NAME + "Shard";
     public final static String REGISTRY_SYSTEM_NAME = "Registry";
-    public final static String REGISTRY_SHARD_REGION_NAME = CHAT_SERVICE_SYSTEM_NAME + "Shard";
+    public final static String REGISTRY_SHARD_REGION_NAME = REGISTRY_SYSTEM_NAME + "Shard";
     public final static String MESSAGE_MANAGER_SYSTEM_NAME = "MessageManager";
     public final static String MESSAGE_MANAGER_SHARD_REGION_NAME = MESSAGE_MANAGER_SYSTEM_NAME + "Shard";
     public final static String BROKER_SYSTEM_NAME = "Broker";
@@ -41,14 +41,14 @@ public class NetworkUtility {
     public static List<Address> getClusterSeed(String system, int port) {
         List<Address> list = new LinkedList<>();
         list.add(new Address("akka.tcp", system, getLanOrLocal(), port));
-        //list.add(new Address("akka.tcp", system, getLanOrLocal(), port + 1));
+        list.add(new Address("akka.tcp", system, getLanOrLocal(), port + 1));
         return list;
     }
 
     public static Set<ActorPath> initialContacts(String system, int port) {
-        return new HashSet<ActorPath>(Arrays.asList(
-                ActorPaths.fromString("akka.tcp://" + system + "@" + getLanOrLocal() + ":" + port + "/system/receptionist")));/*,
-                ActorPaths.fromString("akka.tcp://" + system + "@" + getLanOrLocal() + ":" + (port + 1) + "/system/receptionist")));*/
+        return new HashSet<>(Arrays.asList(
+                ActorPaths.fromString("akka.tcp://" + system + "@" + getLanOrLocal() + ":" + port + "/system/receptionist"),
+                ActorPaths.fromString("akka.tcp://" + system + "@" + getLanOrLocal() + ":" + (port + 1) + "/system/receptionist")));
     }
 
     public static String getLANIP() {

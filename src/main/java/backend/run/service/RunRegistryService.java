@@ -31,6 +31,7 @@ import java.io.File;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.TimeUnit;
 
+import static akka.http.javadsl.server.PathMatchers.neutral;
 import static akka.http.javadsl.server.PathMatchers.segment;
 import static akka.pattern.PatternsCS.ask;
 
@@ -80,8 +81,9 @@ public class RunRegistryService extends AllDirectives {
 
     private Route createRoute() {
         return route(pathPrefix("chats", () ->
-                path(segment(), (String chatId) ->
+                pathPrefix(segment(), (String chatId) ->
                         pathPrefix("users", () -> route(
+                                path(neutral(), () -> route(
                                 get(() -> {
                                     final Timeout timeout = Timeout.durationToTimeout(
                                             FiniteDuration.apply(10, TimeUnit.SECONDS));
@@ -109,7 +111,7 @@ public class RunRegistryService extends AllDirectives {
                                                     }
                                             );
                                     return completeWithFuture(httpResponseFuture);
-                                }),
+                                }))),
 
                                 path(segment(), (String userId) -> route(
                                         post(() -> {

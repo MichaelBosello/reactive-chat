@@ -23,12 +23,12 @@ public class RegistryState implements Serializable {
     }
 
     public void update(AddUserEvent event) {
-        if (roomList.containsKey(event.getChatId())) {
+        if (!roomList.containsKey(event.getChatId())) {
             Set<String> room = new HashSet<>();
             room.add(event.getUserId());
             roomList.put(event.getChatId(), room);
         } else {
-            roomList.get(event.getUserId()).add(event.getUserId());
+            roomList.get(event.getChatId()).add(event.getUserId());
         }
 
     }

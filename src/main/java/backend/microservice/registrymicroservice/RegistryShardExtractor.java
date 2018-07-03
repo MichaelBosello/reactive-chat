@@ -14,7 +14,7 @@ public class RegistryShardExtractor implements ShardRegion.MessageExtractor {
         if (message instanceof AddUserMessage)
             return ((AddUserMessage) message).getChatId();
         else if (message instanceof RemoveUserMessage) {
-            return ((AddUserMessage) message).getChatId();
+            return ((RemoveUserMessage) message).getChatId();
         } else if (message instanceof GetUsersMessage) {
             return ((GetUsersMessage) message).getChatId();
         } else
