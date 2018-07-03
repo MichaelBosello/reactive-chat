@@ -21,7 +21,7 @@ import static akka.pattern.PatternsCS.pipe;
 
 public class MessageManagerActor extends AbstractActor {
 
-    private String brokerServiceURL = "http://" + NetworkUtility.getLanOrLocal() + ":" + NetworkUtility.MESSAGE_MANAGER_MICROSERVICE_PORT;
+    private String brokerServiceURL = "http://" + NetworkUtility.getLanOrLocal() + ":" + NetworkUtility.BROKER_MICROSERVICE_PORT;
 
     final Http http = Http.get(context().system());
     final ExecutionContextExecutor dispatcher = context().dispatcher();

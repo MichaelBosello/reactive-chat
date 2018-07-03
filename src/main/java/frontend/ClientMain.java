@@ -23,7 +23,7 @@ public class ClientMain {
                 ConfigFactory.parseString("akka.remote.netty.tcp.port=" + port).withFallback(config);
         ActorSystem system = ActorSystem.create("client", portConfig);
         Address addr = new Address("akka.tcp", "client", ip, port);
-        ActorRef client = system.actorOf(Props.create(ChatActor.class).withDeploy(
+        ActorRef client = system.actorOf(Props.create(ChatClientActor.class).withDeploy(
                 new Deploy(new RemoteScope(addr))));
 
         System.out.println("Client on " + ip + ":" + port);

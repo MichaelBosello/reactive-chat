@@ -16,7 +16,7 @@ import utility.NetworkUtility;
 
 import java.io.File;
 
-public class RunRegistryCluster {
+public class RunBrokerCluster {
 
     private final static int CASSANDRA_PORT = 9042;
 
@@ -25,25 +25,25 @@ public class RunRegistryCluster {
             File cassandraDirectory = new File("target/chat");
             CassandraLauncher.start(cassandraDirectory, CassandraLauncher.DefaultTestConfigResource(), true, CASSANDRA_PORT);
         }
-        deployRegistryActor();
+        deployBrokerActor();
     }
 
-    public static void deployRegistryActor() {
+    public static void deployBrokerActor() {
         String ip = NetworkUtility.getLanOrLocal();
-        int port = NetworkUtility.findNextAviablePort(ip, NetworkUtility.REGISTRY_FIRST_PORT);
+        int port = NetworkUtility.findNextAviablePort(ip, NetworkUtility.BROKER_FIRST_PORT);
         System.out.println("Try connection on " + ip + ":" + port);
         Config config = ConfigFactory.parseFile(new File("src/main/resources/cluster.conf"));
         Config portConfig =
                 ConfigFactory.parseString("akka.remote.netty.tcp.port=" + port + "\n" +
                         "akka.remote.netty.tcp.hostname=" + ip).withFallback(config);
 
-        ActorSystem system = ActorSystem.create(NetworkUtility.REGISTRY_SYSTEM_NAME, portConfig);
+        ActorSystem system = ActorSystem.create(NetworkUtility.BROKER_SYSTEM_NAME, portConfig);
         final Cluster cluster = Cluster.get(system);
         cluster.joinSeedNodes(NetworkUtility.getClusterSeed(
-                NetworkUtility.REGISTRY_SYSTEM_NAME, NetworkUtility.REGISTRY_FIRST_PORT));
+                NetworkUtility.BROKER_SYSTEM_NAME, NetworkUtility.BROKER_FIRST_PORT));
 
         ClusterShardingSettings settings = ClusterShardingSettings.create(system);
-        ActorRef shardRegion = ClusterSharding.get(system).start(NetworkUtility.REGISTRY_SHARD_REGION_NAME,
+        ActorRef shardRegion = ClusterSharding.get(system).start(NetworkUtility.BROKER_SHARD_REGION_NAME,
                 Props.create(ChatActor.class), settings, new ChatShardExtractor());
 
         ClusterClientReceptionist.get(system).registerService(shardRegion);

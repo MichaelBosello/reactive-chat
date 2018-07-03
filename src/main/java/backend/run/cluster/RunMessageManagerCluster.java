@@ -25,10 +25,10 @@ public class RunMessageManagerCluster {
             File cassandraDirectory = new File("target/chat");
             CassandraLauncher.start(cassandraDirectory, CassandraLauncher.DefaultTestConfigResource(), true, CASSANDRA_PORT);
         }
-        deployChatRoomActor();
+        deployMessageManagerActor();
     }
 
-    public static void deployChatRoomActor() {
+    public static void deployMessageManagerActor() {
         String ip = NetworkUtility.getLanOrLocal();
         int port = NetworkUtility.findNextAviablePort(ip, NetworkUtility.MESSAGE_MANAGER_FIRST_PORT);
         System.out.println("Try connection on " + ip + ":" + port);

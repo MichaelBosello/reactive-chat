@@ -12,7 +12,7 @@ import utility.NetworkUtility;
 
 import static akka.pattern.PatternsCS.pipe;
 
-public class ChatActor extends AbstractActorWithStash {
+public class ChatClientActor extends AbstractActorWithStash {
 
     private String chatServiceURL = "http://" + NetworkUtility.getLanOrLocal() + ":" + NetworkUtility.CHAT_SERVICE_PORT;
     private final ActorRef gui;
@@ -20,7 +20,7 @@ public class ChatActor extends AbstractActorWithStash {
     final Http http = Http.get(context().system());
     final ExecutionContextExecutor dispatcher = context().dispatcher();
 
-    public ChatActor() {
+    public ChatClientActor() {
         gui = getContext().actorOf(Props.create(ChatGUIActor.class));
     }
 

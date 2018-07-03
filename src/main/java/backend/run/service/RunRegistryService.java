@@ -91,9 +91,10 @@ public class RunRegistryService extends AllDirectives {
                                                             new GetUsersMessage(chatId), true),
                                                     timeout).thenApply(
                                                     response -> {
+                                                        UserListMessage userListMessage = (UserListMessage) response;
                                                         Location locationHeader = Location.create(
                                                                 registryMicroserviceUrl + "/chats/" + chatId + "/users");
-                                                        UserList users = new UserList(((UserListMessage) response).getUsers());
+                                                        UserList users = new UserList(userListMessage.getUsers(), userListMessage.getChatId());
                                                         String usersJson = "";
                                                         try {
                                                             usersJson = jsonMapper.writeValueAsString(users);
