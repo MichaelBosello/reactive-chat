@@ -134,6 +134,7 @@ public class DChatGUI extends JFrame implements ChatGUI {
     }
 
     private void notifyLeave(String name) {
+        this.setState(Frame.ICONIFIED);
         for (final ChatObserver observer : this.guiObserver) {
             observer.leaveEvent(name);
         }
