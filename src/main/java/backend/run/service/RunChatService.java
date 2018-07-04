@@ -149,7 +149,8 @@ public class RunChatService extends AllDirectives {
                                                                 } else {
                                                                     return HttpResponse.create()
                                                                             .withStatus(StatusCodes.NOT_FOUND)
-                                                                            .addHeader(locationHeader);
+                                                                            .addHeader(locationHeader)
+                                                                            .withEntity("Chat not found");
                                                                 }
                                                             }
                                                     );
@@ -173,7 +174,8 @@ public class RunChatService extends AllDirectives {
                                                                 } else {
                                                                     return HttpResponse.create()
                                                                             .withStatus(StatusCodes.NOT_FOUND)
-                                                                            .addHeader(locationHeader);
+                                                                            .addHeader(locationHeader)
+                                                                            .withEntity("Chat not found");
                                                                 }
                                                             }
                                                     );
