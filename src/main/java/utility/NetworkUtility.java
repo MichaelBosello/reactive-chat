@@ -18,6 +18,7 @@ public class NetworkUtility {
     public final static int BROKER_FIRST_PORT = 2951;
 
     public final static int CLIENT_CHAT_BASE_PORT = 3001;
+    public final static int CHAT_CLIENT_RECEIVE_PORT = 3501;
 
     public final static int CHAT_SERVICE_CLIENT_PORT = 5651;
     public final static int REGISTRY_CLIENT_PORT = 5751;

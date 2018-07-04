@@ -24,7 +24,7 @@ public class DChatGUI extends JFrame implements ChatGUI {
         this.addWindowListener(new java.awt.event.WindowAdapter() {
             @Override
             public void windowClosing(java.awt.event.WindowEvent e) {
-                notifyLeave();
+                notifyLeave(registryHost.getText());
             }
         });
         this.setLayout(new BorderLayout());
@@ -51,7 +51,7 @@ public class DChatGUI extends JFrame implements ChatGUI {
                 newChatButton.setEnabled(false);
                 notifyJoin(registryHost.getText());
             }else{
-                notifyLeave();
+                notifyLeave(registryHost.getText());
             }
         });
         connectionPanel.add(joinButton);
@@ -133,9 +133,9 @@ public class DChatGUI extends JFrame implements ChatGUI {
         }
     }
 
-    private void notifyLeave() {
+    private void notifyLeave(String name) {
         for (final ChatObserver observer : this.guiObserver) {
-            observer.leaveEvent();
+            observer.leaveEvent(name);
         }
     }
 

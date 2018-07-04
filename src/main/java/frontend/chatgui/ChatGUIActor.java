@@ -18,8 +18,8 @@ public class ChatGUIActor extends AbstractActor {
             }
 
             @Override
-            public void leaveEvent() {
-                getContext().parent().tell(new LeaveRequestMessage(), getSelf());
+            public void leaveEvent(String name) {
+                getContext().parent().tell(new LeaveRequestMessage(name), getSelf());
             }
 
             @Override
@@ -36,10 +36,9 @@ public class ChatGUIActor extends AbstractActor {
 
     @Override
     public Receive createReceive() {
-        return receiveBuilder().match(NextMessages.class, msg -> {
+        return receiveBuilder().match(NextMessage.class, msg -> {
             SwingUtilities.invokeLater(() -> {
-                for (String message : msg.getMessage())
-                    gui.newMessage(message);
+                gui.newMessage(msg.getMessage());
             });
         }).match(ConnectionResultMessage.class, msg -> {
             if (msg.isSuccess()) {

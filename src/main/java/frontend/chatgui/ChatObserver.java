@@ -4,7 +4,7 @@ public interface ChatObserver {
 
     void joinEvent(String name);
 
-    void leaveEvent();
+    void leaveEvent(String name);
 
     void newChatEvent(String name);
 

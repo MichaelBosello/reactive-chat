@@ -78,7 +78,7 @@ public class BrokerActor extends AbstractActor {
 
     private void send(Set<String> users, String message){
         for (String user : users) {
-            http.singleRequest(HttpRequest.POST(user + "/nextmessage/")
+            http.singleRequest(HttpRequest.POST( "http://" + user + "/nextmessage/")
                     .withEntity(HttpEntities.create(
                             ContentTypes.TEXT_PLAIN_UTF8, message)));
         }
