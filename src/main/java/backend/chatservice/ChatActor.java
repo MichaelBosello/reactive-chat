@@ -24,6 +24,7 @@ import java.util.Set;
 public class ChatActor extends AbstractPersistentActor {
 
     private String registryServiceURL = "http://" + NetworkUtility.getLanOrLocal() + ":" + NetworkUtility.REGISTRY_MICROSERVICE_PORT;
+    private String messageManagerServiceURL = "http://" + NetworkUtility.getLanOrLocal() + ":" + NetworkUtility.MESSAGE_MANAGER_MICROSERVICE_PORT;
     final Http http = Http.get(context().system());
     private final ObjectMapper jsonMapper = new ObjectMapper();
 
@@ -106,7 +107,7 @@ public class ChatActor extends AbstractPersistentActor {
                             e.printStackTrace();
                         }
                         http.singleRequest(HttpRequest.POST(
-                                registryServiceURL + "/chats/" + msg.getChatId() + "/messages")
+                                messageManagerServiceURL + "/chats/" + msg.getChatId() + "/messages")
                                 .withEntity(HttpEntities.create(
                                         ContentTypes.APPLICATION_JSON, messageJson)));
                         getSender().tell(new SuccessMessage(), getSelf());
