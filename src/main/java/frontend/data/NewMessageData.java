@@ -1,15 +1,15 @@
-package backend.chatservice.data;
+package frontend.data;
 
-public class NewMessage {
+public class NewMessageData {
 
     private String chatId;
     private String userId;
     private String message;
 
-    public NewMessage() {
+    public NewMessageData() {
     }
 
-    public NewMessage(String chatId, String userId, String message) {
+    public NewMessageData(String chatId, String userId, String message) {
         this.chatId = chatId;
         this.userId = userId;
         this.message = message;

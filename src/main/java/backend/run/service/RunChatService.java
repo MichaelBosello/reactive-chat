@@ -17,6 +17,7 @@ import akka.http.javadsl.server.Route;
 import akka.stream.ActorMaterializer;
 import akka.stream.javadsl.Flow;
 import akka.util.Timeout;
+import backend.chatservice.data.NewMessageData;
 import backend.chatservice.message.*;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
@@ -104,7 +105,7 @@ public class RunChatService extends AllDirectives {
                                     return completeWithFuture(httpResponseFuture);
                                 }))),
                         path("messages", () ->
-                                post(() -> entity(Jackson.unmarshaller(NewMessage.class), newMessage -> {
+                                post(() -> entity(Jackson.unmarshaller(NewMessageData.class), newMessage -> {
                                     final Timeout timeout = Timeout.durationToTimeout(
                                             FiniteDuration.apply(10, TimeUnit.SECONDS));
                                     CompletionStage<HttpResponse> httpResponseFuture =

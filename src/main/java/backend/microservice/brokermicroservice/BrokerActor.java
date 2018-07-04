@@ -9,7 +9,9 @@ import akka.http.javadsl.model.HttpResponse;
 import backend.microservice.brokermicroservice.message.SendMessage;
 import backend.microservice.registrymicroservice.data.UserList;
 import backend.microservice.registrymicroservice.message.SuccessMessage;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import frontend.data.NewMessageData;
 import scala.concurrent.ExecutionContextExecutor;
 import utility.NetworkUtility;
 
@@ -46,21 +48,20 @@ public class BrokerActor extends AbstractActor {
                             waitingNewUserList.add(msg.getChatId());
                             toPendingList(msg);
                         } else {
-                            send(chatUsers.get(msg.getChatId()), msg.getMessage());
+                            send(msg.getChatId(), chatUsers.get(msg.getChatId()), msg.getMessage());
                         }
                     }
                     getSender().tell(new SuccessMessage(), getSelf());
 
                 }).match(HttpResponse.class, response -> {
-                    System.out.println(response.entity().toString());
                     String jsonResponse = response.entity().toString()
-                            .substring(44, response.entity().toString().length() -1);
+                            .substring(35, response.entity().toString().length() -1);
                     UserList newList = mapper.readValue(jsonResponse, UserList.class);
                     chatUsers.put(newList.getChatId(), newList.getUsers());
 
                     waitingNewUserList.remove(newList.getChatId());
                     for (String message: messagePending.get(newList.getChatId())) {
-                        send(newList.getUsers(), message);
+                        send(newList.getChatId(), newList.getUsers(), message);
                     }
                     messagePending.remove(newList.getChatId());
                 }).build();
@@ -76,11 +77,21 @@ public class BrokerActor extends AbstractActor {
         }
     }
 
-    private void send(Set<String> users, String message){
+    private void send(String chat, Set<String> users, String message){
         for (String user : users) {
-            http.singleRequest(HttpRequest.POST( "http://" + user + "/nextmessage/")
+
+            NewMessageData messageData = new NewMessageData(chat, user, message);
+
+            String messageJson = "";
+            try {
+                messageJson = mapper.writeValueAsString(messageData);
+            } catch (JsonProcessingException e) {
+                e.printStackTrace();
+            }
+
+            http.singleRequest(HttpRequest.POST( "http://" + user + "/nextmessage")
                     .withEntity(HttpEntities.create(
-                            ContentTypes.TEXT_PLAIN_UTF8, message)));
+                            ContentTypes.APPLICATION_JSON, messageJson)));
         }
     }
 }

@@ -15,7 +15,7 @@ import akka.stream.ActorMaterializer;
 import akka.stream.javadsl.Flow;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
-import frontend.data.NewMessage;
+import frontend.data.NewMessageData;
 import frontend.message.NextMessage;
 import utility.NetworkUtility;
 
@@ -63,8 +63,8 @@ public class ClientMain extends AllDirectives {
     }
 
     private Route createRoute() {
-        return route(path("messages", () ->
-                post(() -> entity(Jackson.unmarshaller(NewMessage.class), newMessage -> {
+        return route(path("nextmessage", () ->
+                post(() -> entity(Jackson.unmarshaller(NewMessageData.class), newMessage -> {
                     client.tell(new NextMessage(newMessage.getMessage()), ActorRef.noSender());
                     return complete(StatusCodes.ACCEPTED, "message received");
                 }))));

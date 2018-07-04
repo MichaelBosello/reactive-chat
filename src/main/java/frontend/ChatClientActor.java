@@ -6,7 +6,7 @@ import akka.http.javadsl.model.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import frontend.chatgui.ChatGUIActor;
-import frontend.data.NewMessage;
+import frontend.data.NewMessageData;
 import frontend.message.*;
 import scala.concurrent.ExecutionContextExecutor;
 import utility.NetworkUtility;
@@ -49,14 +49,14 @@ public class ChatClientActor extends AbstractActorWithStash {
                     pipe(http.singleRequest(HttpRequest.POST(chatServiceURL + "/chats/" + req.getName() + "/"))
                         , dispatcher).to(self());
                 }).match(SendMessage.class, msg -> {
-                    NewMessage message = new NewMessage(chat, address, msg.getMessage());
+                    NewMessageData message = new NewMessageData(chat, address, msg.getMessage());
                     String messageJson = "";
                     try {
                         messageJson = jsonMapper.writeValueAsString(message);
                     } catch (JsonProcessingException e) {
                         e.printStackTrace();
                     }
-                    pipe(http.singleRequest(HttpRequest.POST(chatServiceURL + "/chats/" + chat + "/messages/").withEntity(
+                    pipe(http.singleRequest(HttpRequest.POST(chatServiceURL + "/chats/" + chat + "/messages").withEntity(
                             HttpEntities.create( ContentTypes.APPLICATION_JSON, messageJson)))
                             , dispatcher).to(self());
                 }).match(NextMessage.class, response -> {
@@ -70,16 +70,22 @@ public class ChatClientActor extends AbstractActorWithStash {
                             } else if(response.status().intValue() == StatusCodes.NO_CONTENT.intValue()){
                                 System.exit(0);
                             } else {
-                                String responseBody = response.entity().toString().substring(44, response.entity().toString().length() -1);
-                                gui.tell(new ConnectionResultMessage(false, responseBody), getSelf());
+                                if(response.entity().toString().length() > 45) {
+                                    String responseBody = response.entity().toString().substring(44, response.entity().toString().length() - 1);
+                                    gui.tell(new ConnectionResultMessage(false, responseBody), getSelf());
+                                }
                             }
+                        } else if (response.getHeader("Location").toString().contains("/messages/")) {
+                            //nothing for now
                         } else {
                             boolean success = false;
                             if(response.status().intValue() == StatusCodes.CREATED.intValue()){
                                 success = true;
                             }
-                            String responseBody = response.entity().toString().substring(44, response.entity().toString().length() -1);
-                            gui.tell(new NewChatResponseMessage(success, responseBody), getSelf());
+                            if(response.entity().toString().length() > 45) {
+                                String responseBody = response.entity().toString().substring(44, response.entity().toString().length() - 1);
+                                gui.tell(new NewChatResponseMessage(success, responseBody), getSelf());
+                            }
                         }
                     }
                 })
