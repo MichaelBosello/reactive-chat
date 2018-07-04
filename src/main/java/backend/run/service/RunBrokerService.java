@@ -92,7 +92,7 @@ public class RunBrokerService extends AllDirectives {
                                                         Location locationHeader = Location.create(
                                                                 brokerMicroserviceUrl + "/chats/" + chatId + "/send/");
                                                         return HttpResponse.create()
-                                                                .withStatus(StatusCodes.OK)
+                                                                .withStatus(StatusCodes.ACCEPTED)
                                                                 .addHeader(locationHeader);
                                                     }
                                             );

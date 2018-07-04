@@ -17,10 +17,7 @@ import akka.http.javadsl.server.Route;
 import akka.stream.ActorMaterializer;
 import akka.stream.javadsl.Flow;
 import akka.util.Timeout;
-import backend.chatservice.message.AddUserMessage;
-import backend.chatservice.message.ChatCreatedMessage;
-import backend.chatservice.message.NewChatMessage;
-import backend.chatservice.message.NewMessage;
+import backend.chatservice.message.*;
 import backend.microservice.registrymicroservice.message.RemoveUserMessage;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
@@ -120,9 +117,15 @@ public class RunChatService extends AllDirectives {
                                                     response -> {
                                                         Location locationHeader = Location.create(
                                                                 chatServiceUrl + "/chats/" + chatId + "/messages/");
-                                                        return HttpResponse.create()
-                                                                .withStatus(StatusCodes.OK)
-                                                                .addHeader(locationHeader);
+                                                        if(response instanceof SuccessMessage) {
+                                                            return HttpResponse.create()
+                                                                    .withStatus(StatusCodes.OK)
+                                                                    .addHeader(locationHeader);
+                                                        } else {
+                                                            return HttpResponse.create()
+                                                                    .withStatus(StatusCodes.NOT_FOUND)
+                                                                    .addHeader(locationHeader);
+                                                        }
                                                     }
                                             );
                                     return completeWithFuture(httpResponseFuture);
@@ -140,9 +143,15 @@ public class RunChatService extends AllDirectives {
                                                             response -> {
                                                                 Location locationHeader = Location.create(
                                                                         chatServiceUrl + "/chats/" + chatId + "/users/" + userId);
-                                                                return HttpResponse.create()
-                                                                        .withStatus(StatusCodes.CREATED)
-                                                                        .addHeader(locationHeader);
+                                                                if(response instanceof SuccessMessage) {
+                                                                    return HttpResponse.create()
+                                                                            .withStatus(StatusCodes.CREATED)
+                                                                            .addHeader(locationHeader);
+                                                                } else {
+                                                                    return HttpResponse.create()
+                                                                            .withStatus(StatusCodes.NOT_FOUND)
+                                                                            .addHeader(locationHeader);
+                                                                }
                                                             }
                                                     );
                                             return completeWithFuture(httpResponseFuture);
@@ -158,9 +167,15 @@ public class RunChatService extends AllDirectives {
                                                             response -> {
                                                                 Location locationHeader = Location.create(
                                                                         chatServiceUrl + "/chats/" + chatId + "/users/" + userId);
-                                                                return HttpResponse.create()
-                                                                        .withStatus(StatusCodes.CREATED)
-                                                                        .addHeader(locationHeader);
+                                                                if(response instanceof SuccessMessage) {
+                                                                    return HttpResponse.create()
+                                                                            .withStatus(StatusCodes.NO_CONTENT)
+                                                                            .addHeader(locationHeader);
+                                                                } else {
+                                                                    return HttpResponse.create()
+                                                                            .withStatus(StatusCodes.NOT_FOUND)
+                                                                            .addHeader(locationHeader);
+                                                                }
                                                             }
                                                     );
                                             return completeWithFuture(httpResponseFuture);

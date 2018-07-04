@@ -144,7 +144,7 @@ public class RunRegistryService extends AllDirectives {
                                                                 Location locationHeader = Location.create(
                                                                         registryMicroserviceUrl + "/chats/" + chatId + "/users/" + userId);
                                                                 return HttpResponse.create()
-                                                                        .withStatus(StatusCodes.CREATED)
+                                                                        .withStatus(StatusCodes.NO_CONTENT)
                                                                         .addHeader(locationHeader);
                                                             }
                                                     );
