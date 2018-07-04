@@ -7,6 +7,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import frontend.chatgui.ChatGUIActor;
 import frontend.data.NewMessageData;
+import frontend.data.NextMessageData;
 import frontend.message.*;
 import scala.concurrent.ExecutionContextExecutor;
 import utility.NetworkUtility;
@@ -19,6 +20,7 @@ public class ChatClientActor extends AbstractActorWithStash {
     private final String address;
     private final ActorRef gui;
     private String chat = "";
+    private int messageIndex = 0;
 
     final Http http = Http.get(context().system());
     final ExecutionContextExecutor dispatcher = context().dispatcher();
@@ -47,7 +49,7 @@ public class ChatClientActor extends AbstractActorWithStash {
                             , dispatcher).to(self());
                 }).match(NewChatRequestMessage.class, req -> {
                     pipe(http.singleRequest(HttpRequest.POST(chatServiceURL + "/chats/" + req.getName() + "/"))
-                        , dispatcher).to(self());
+                            , dispatcher).to(self());
                 }).match(SendMessage.class, msg -> {
                     NewMessageData message = new NewMessageData(chat, address, msg.getMessage());
                     String messageJson = "";
@@ -57,20 +59,25 @@ public class ChatClientActor extends AbstractActorWithStash {
                         e.printStackTrace();
                     }
                     pipe(http.singleRequest(HttpRequest.POST(chatServiceURL + "/chats/" + chat + "/messages").withEntity(
-                            HttpEntities.create( ContentTypes.APPLICATION_JSON, messageJson)))
+                            HttpEntities.create(ContentTypes.APPLICATION_JSON, messageJson)))
                             , dispatcher).to(self());
-                }).match(NextMessage.class, response -> {
-                    gui.tell(response, getSelf());
+                }).match(NextMessage.class, msg -> {
+                    if (msg.getIndex() == messageIndex) {
+                        gui.tell(msg, getSelf());
+                        unstashAll();
+                    } else {
+                        stash();
+                    }
                 })
                 .match(HttpResponse.class, response -> {
                     if (response.getHeader("Location").isPresent()) {
                         if (response.getHeader("Location").toString().contains("/users/")) {
-                            if(response.status().intValue() == StatusCodes.CREATED.intValue()){
+                            if (response.status().intValue() == StatusCodes.CREATED.intValue()) {
                                 gui.tell(new ConnectionResultMessage(true, ""), getSelf());
-                            } else if(response.status().intValue() == StatusCodes.NO_CONTENT.intValue()){
+                            } else if (response.status().intValue() == StatusCodes.NO_CONTENT.intValue()) {
                                 System.exit(0);
                             } else {
-                                if(response.entity().toString().length() > 45) {
+                                if (response.entity().toString().length() > 45) {
                                     String responseBody = response.entity().toString().substring(44, response.entity().toString().length() - 1);
                                     gui.tell(new ConnectionResultMessage(false, responseBody), getSelf());
                                 }
@@ -79,10 +86,10 @@ public class ChatClientActor extends AbstractActorWithStash {
                             //nothing for now
                         } else {
                             boolean success = false;
-                            if(response.status().intValue() == StatusCodes.CREATED.intValue()){
+                            if (response.status().intValue() == StatusCodes.CREATED.intValue()) {
                                 success = true;
                             }
-                            if(response.entity().toString().length() > 45) {
+                            if (response.entity().toString().length() > 45) {
                                 String responseBody = response.entity().toString().substring(44, response.entity().toString().length() - 1);
                                 gui.tell(new NewChatResponseMessage(success, responseBody), getSelf());
                             }
@@ -91,5 +98,4 @@ public class ChatClientActor extends AbstractActorWithStash {
                 })
                 .build();
     }
-
 }

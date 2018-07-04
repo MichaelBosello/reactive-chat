@@ -6,15 +6,17 @@ public class UserMessage {
     private String userId;
     private String message;
     private boolean chatChanged;
+    private int index;
 
     public UserMessage() {
     }
 
-    public UserMessage(String chatId, String userId, String message, boolean chatChanged) {
+    public UserMessage(String chatId, String userId, String message, boolean chatChanged, int index) {
         this.chatId = chatId;
         this.userId = userId;
         this.message = message;
         this.chatChanged = chatChanged;
+        this.index = index;
     }
 
     public String getChatId() {
@@ -47,5 +49,13 @@ public class UserMessage {
 
     public void setChatChanged(boolean chatChanged) {
         this.chatChanged = chatChanged;
+    }
+
+    public int getIndex() {
+        return index;
+    }
+
+    public void setIndex(int index) {
+        this.index = index;
     }
 }

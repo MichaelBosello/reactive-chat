@@ -86,7 +86,7 @@ public class RunBrokerService extends AllDirectives {
                                             ask(client, new ClusterClient.Send("/system/sharding/" +
                                                             NetworkUtility.BROKER_SHARD_REGION_NAME,
                                                             new SendMessage(chatId, userMessage.getUserId(),
-                                                                    userMessage.getMessage(), userMessage.isChatChanged()), true),
+                                                                    userMessage.getMessage(), userMessage.isChatChanged(), userMessage.getIndex()), true),
                                                     timeout).thenApply(
                                                     response -> {
                                                         Location locationHeader = Location.create(

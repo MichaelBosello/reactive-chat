@@ -6,12 +6,12 @@ import akka.http.javadsl.model.ContentTypes;
 import akka.http.javadsl.model.HttpEntities;
 import akka.http.javadsl.model.HttpRequest;
 import akka.http.javadsl.model.HttpResponse;
+import backend.microservice.brokermicroservice.data.NextMessageData;
 import backend.microservice.brokermicroservice.message.SendMessage;
 import backend.microservice.registrymicroservice.data.UserList;
 import backend.microservice.registrymicroservice.message.SuccessMessage;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import frontend.data.NewMessageData;
 import scala.concurrent.ExecutionContextExecutor;
 import utility.NetworkUtility;
 
@@ -31,7 +31,7 @@ public class BrokerActor extends AbstractActor {
     ObjectMapper mapper = new ObjectMapper();
 
     private final Map<String, Set<String>> chatUsers = new HashMap<>();
-    private final Map<String, Set<String>> messagePending = new HashMap<>();
+    private final Map<String, Set<SendMessage>> messagePending = new HashMap<>();
     private final Set<String> waitingNewUserList = new HashSet<>();
 
     @Override
@@ -48,7 +48,7 @@ public class BrokerActor extends AbstractActor {
                             waitingNewUserList.add(msg.getChatId());
                             toPendingList(msg);
                         } else {
-                            send(msg.getChatId(), chatUsers.get(msg.getChatId()), msg.getMessage());
+                            send(msg.getChatId(), chatUsers.get(msg.getChatId()), msg.getMessage(), msg.getIndex());
                         }
                     }
                     getSender().tell(new SuccessMessage(), getSelf());
@@ -60,8 +60,8 @@ public class BrokerActor extends AbstractActor {
                     chatUsers.put(newList.getChatId(), newList.getUsers());
 
                     waitingNewUserList.remove(newList.getChatId());
-                    for (String message: messagePending.get(newList.getChatId())) {
-                        send(newList.getChatId(), newList.getUsers(), message);
+                    for (SendMessage message: messagePending.get(newList.getChatId())) {
+                        send(newList.getChatId(), newList.getUsers(), message.getMessage(), message.getIndex());
                     }
                     messagePending.remove(newList.getChatId());
                 }).build();
@@ -69,18 +69,18 @@ public class BrokerActor extends AbstractActor {
 
     private void toPendingList(SendMessage msg){
         if(messagePending.containsKey(msg.getChatId())){
-            messagePending.get(msg.getChatId()).add(msg.getMessage());
+            messagePending.get(msg.getChatId()).add(msg);
         } else {
-            Set<String> pending = new HashSet<>();
-            pending.add(msg.getMessage());
+            Set<SendMessage> pending = new HashSet<>();
+            pending.add(msg);
             messagePending.put(msg.getChatId(), pending);
         }
     }
 
-    private void send(String chat, Set<String> users, String message){
+    private void send(String chat, Set<String> users, String message, int index){
         for (String user : users) {
 
-            NewMessageData messageData = new NewMessageData(chat, user, message);
+            NextMessageData messageData = new NextMessageData(chat, user, message, index);
 
             String messageJson = "";
             try {

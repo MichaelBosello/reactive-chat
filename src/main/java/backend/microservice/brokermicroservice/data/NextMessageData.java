@@ -1,18 +1,20 @@
 package backend.microservice.brokermicroservice.data;
 
-public class NewMessageData {
+public class NextMessageData {
 
     private String chatId;
     private String userId;
     private String message;
+    private int index;
 
-    public NewMessageData() {
+    public NextMessageData() {
     }
 
-    public NewMessageData(String chatId, String userId, String message) {
+    public NextMessageData(String chatId, String userId, String message, int index) {
         this.chatId = chatId;
         this.userId = userId;
         this.message = message;
+        this.index = index;
     }
 
     public String getChatId() {
@@ -37,5 +39,13 @@ public class NewMessageData {
 
     public void setMessage(String message) {
         this.message = message;
+    }
+
+    public int getIndex() {
+        return index;
+    }
+
+    public void setIndex(int index) {
+        this.index = index;
     }
 }
