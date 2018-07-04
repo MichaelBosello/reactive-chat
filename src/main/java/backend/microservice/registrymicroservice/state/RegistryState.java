@@ -34,8 +34,9 @@ public class RegistryState implements Serializable {
     }
 
     public void update(RemoveUserEvent event) {
-        if(roomList.get(event.getUserId()).contains(event.getUserId()))
-            roomList.get(event.getUserId()).remove(event.getUserId());
+        if(roomList.containsKey(event.getChatId()))
+        if(roomList.get(event.getChatId()).contains(event.getUserId()))
+            roomList.get(event.getChatId()).remove(event.getUserId());
     }
 
     public Set<String> getUsers(String chatId){

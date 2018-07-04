@@ -18,7 +18,6 @@ import akka.stream.ActorMaterializer;
 import akka.stream.javadsl.Flow;
 import akka.util.Timeout;
 import backend.chatservice.message.*;
-import backend.microservice.registrymicroservice.message.RemoveUserMessage;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import scala.concurrent.duration.FiniteDuration;

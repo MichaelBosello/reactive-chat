@@ -67,9 +67,11 @@ public class ChatClientActor extends AbstractActorWithStash {
                         if (response.getHeader("Location").toString().contains("/users/")) {
                             if(response.status().intValue() == StatusCodes.CREATED.intValue()){
                                 gui.tell(new ConnectionResultMessage(true, ""), getSelf());
-                            }
-                            if(response.status().intValue() == StatusCodes.NO_CONTENT.intValue()){
+                            } else if(response.status().intValue() == StatusCodes.NO_CONTENT.intValue()){
                                 System.exit(0);
+                            } else {
+                                String responseBody = response.entity().toString().substring(44, response.entity().toString().length() -1);
+                                gui.tell(new ConnectionResultMessage(false, responseBody), getSelf());
                             }
                         } else {
                             boolean success = false;
