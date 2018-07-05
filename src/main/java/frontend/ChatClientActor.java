@@ -20,7 +20,7 @@ public class ChatClientActor extends AbstractActorWithStash {
     private final String address;
     private final ActorRef gui;
     private String chat = "";
-    private int messageIndex = 0;
+    private int messageIndex = -1;
 
     final Http http = Http.get(context().system());
     final ExecutionContextExecutor dispatcher = context().dispatcher();
@@ -62,7 +62,11 @@ public class ChatClientActor extends AbstractActorWithStash {
                             HttpEntities.create(ContentTypes.APPLICATION_JSON, messageJson)))
                             , dispatcher).to(self());
                 }).match(NextMessage.class, msg -> {
+                    if(messageIndex == -1){
+                        messageIndex = msg.getIndex();
+                    }
                     if (msg.getIndex() == messageIndex) {
+                        messageIndex++;
                         gui.tell(msg, getSelf());
                         unstashAll();
                     } else {
