@@ -65,7 +65,7 @@ public class TalkerMain extends AllDirectives {
                 sleep(1000);
                 app.client.tell(
                         new ConnectRequestMessage(CHAT_NAME), null);
-                sleep(20000);//wait for launch another talker
+                sleep(25000);//wait for launch another talker
                 for (int i = 0; i < N_MESSAGE; i++) {
                     if (i == 150) {
                         app.client.tell(new SendMessage(":enter-cs"), null);
