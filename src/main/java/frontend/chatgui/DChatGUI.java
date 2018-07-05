@@ -44,23 +44,27 @@ public class DChatGUI extends JFrame implements ChatGUI {
 
         joinButton = new JButton("Join room");
         joinButton.addActionListener( (e) -> {
-            if(!joined) {
-                joinButton.setText("Connection");
-                joinButton.setEnabled(false);
-                registryHost.setEditable(false);
-                newChatButton.setEnabled(false);
-                notifyJoin(registryHost.getText());
-            }else{
-                notifyLeave(registryHost.getText());
+            if (registryHost.getText() != "") {
+                if (!joined) {
+                    joinButton.setText("Connection");
+                    joinButton.setEnabled(false);
+                    registryHost.setEditable(false);
+                    newChatButton.setEnabled(false);
+                    notifyJoin(registryHost.getText());
+                } else {
+                    notifyLeave(registryHost.getText());
+                }
             }
         });
         connectionPanel.add(joinButton);
 
         newChatButton.addActionListener( (e) -> {
-            newChatButton.setEnabled(false);
-            joinButton.setEnabled(false);
-            registryHost.setEditable(false);
-            notifyNewChatRequest(registryHost.getText());
+            if (registryHost.getText() != "") {
+                newChatButton.setEnabled(false);
+                joinButton.setEnabled(false);
+                registryHost.setEditable(false);
+                notifyNewChatRequest(registryHost.getText());
+            }
         });
         connectionPanel.add(newChatButton);
 
