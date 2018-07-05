@@ -36,7 +36,7 @@ public class ChatClientActor extends AbstractActorWithStash {
         gui = getContext().actorOf(Props.create(ChatGUIActor.class));
     }
 
-    static Props props(String address) {
+    public static Props props(String address) {
         return Props.create(ChatClientActor.class, () -> new ChatClientActor(address));
     }
 

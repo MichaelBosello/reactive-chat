@@ -1,7 +1,6 @@
-package frontend;
-
 import akka.NotUsed;
-import akka.actor.*;
+import akka.actor.ActorRef;
+import akka.actor.ActorSystem;
 import akka.http.javadsl.ConnectHttp;
 import akka.http.javadsl.Http;
 import akka.http.javadsl.ServerBinding;
@@ -15,14 +14,24 @@ import akka.stream.ActorMaterializer;
 import akka.stream.javadsl.Flow;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
+import frontend.ChatClientActor;
 import frontend.data.NextMessageData;
+import frontend.message.ConnectRequestMessage;
+import frontend.message.NewChatRequestMessage;
 import frontend.message.NextMessage;
+import frontend.message.SendMessage;
 import utility.NetworkUtility;
 
 import java.io.File;
 import java.util.concurrent.CompletionStage;
 
-public class ClientMain extends AllDirectives {
+import static java.lang.Thread.sleep;
+
+
+public class TalkerMain extends AllDirectives {
+
+    private final static int N_MESSAGE = 200;
+    private final static String CHAT_NAME = "chat";
 
     private static String chatServiceUrl;
     private final ActorRef client;
@@ -42,11 +51,33 @@ public class ClientMain extends AllDirectives {
         int serverPort = NetworkUtility.findNextAviablePort(ip, NetworkUtility.CHAT_CLIENT_RECEIVE_PORT);
         chatServiceUrl = "http://" + ip + ":" + serverPort;
 
-        ClientMain app = new ClientMain(system, ip + ":" + serverPort);
+        TalkerMain app = new TalkerMain(system, ip + ":" + serverPort);
 
         final Flow<HttpRequest, HttpResponse, NotUsed> routeFlow = app.createRoute().flow(system, materializer);
         final CompletionStage<ServerBinding> binding = http.bindAndHandle(routeFlow,
                 ConnectHttp.toHost(ip, serverPort), materializer);
+
+        new Thread(() -> {
+            try {
+                sleep(1000);
+                app.client.tell(
+                        new NewChatRequestMessage(CHAT_NAME), null);
+                sleep(1000);
+                app.client.tell(
+                        new ConnectRequestMessage(CHAT_NAME), null);
+                sleep(20000);//wait for launch another talker
+                for (int i = 0; i < N_MESSAGE; i++) {
+                    if (i == 150) {
+                        app.client.tell(new SendMessage(":enter-cs"), null);
+                    }
+                    app.client.tell(new SendMessage("##User" + ip + ":" + serverPort + "## message: " + i), null);
+                    sleep(200);
+                }
+
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }).start();
 
         System.out.println("Server online at " + chatServiceUrl + "/\nPress RETURN to stop...");
         System.in.read(); // let it run until user presses return
@@ -56,7 +87,7 @@ public class ClientMain extends AllDirectives {
                 .thenAccept(unbound -> system.terminate()); // and shutdown when done
     }
 
-    public ClientMain(final ActorSystem system, String address) {
+    public TalkerMain(final ActorSystem system, String address) {
         client = system.actorOf(ChatClientActor.props(address), "client");
     }
 
