@@ -18,13 +18,7 @@ import java.io.File;
 
 public class RunMessageManagerCluster {
 
-    private final static int CASSANDRA_PORT = 9042;
-
     public static void main(String[] args) {
-        if(NetworkUtility.findNextAviablePort("localhost", CASSANDRA_PORT) == CASSANDRA_PORT) {
-            File cassandraDirectory = new File("target/chat");
-            CassandraLauncher.start(cassandraDirectory, CassandraLauncher.DefaultTestConfigResource(), true, CASSANDRA_PORT);
-        }
         deployMessageManagerActor();
     }
 

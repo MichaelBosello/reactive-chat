@@ -7,7 +7,6 @@ import akka.cluster.Cluster;
 import akka.cluster.client.ClusterClientReceptionist;
 import akka.cluster.sharding.ClusterSharding;
 import akka.cluster.sharding.ClusterShardingSettings;
-import akka.persistence.cassandra.testkit.CassandraLauncher;
 import backend.microservice.brokermicroservice.BrokerActor;
 import backend.microservice.brokermicroservice.BrokerShardExtractor;
 import com.typesafe.config.Config;
@@ -18,13 +17,7 @@ import java.io.File;
 
 public class RunBrokerCluster {
 
-    private final static int CASSANDRA_PORT = 9042;
-
     public static void main(String[] args) {
-        if(NetworkUtility.findNextAviablePort("localhost", CASSANDRA_PORT) == CASSANDRA_PORT) {
-            File cassandraDirectory = new File("target/chat");
-            CassandraLauncher.start(cassandraDirectory, CassandraLauncher.DefaultTestConfigResource(), true, CASSANDRA_PORT);
-        }
         deployBrokerActor();
     }
 
