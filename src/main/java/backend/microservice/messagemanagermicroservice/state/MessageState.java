@@ -21,7 +21,7 @@ public class MessageState implements Serializable {
     }
 
     public void update(UpdateIndexEvent event) {
-        int next = messageIndex.get(event.getChatId()) + 1;
+        int next = getIndex(event.getChatId()) + 1;
         messageIndex.replace(event.getChatId(), next);
     }
 
