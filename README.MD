@@ -1,6 +1,6 @@
 # Reactive chat
 
-A reactive chat service that takes into account non-functional aspects such as scalability, resilience and responsiveness. Each chat has the following qualities: the messages sent must be displayed in the same order by all users. The chat supports dynamic set of participants. Finally, A user can request to be the only one to write in the chat for a limited time.
+A reactive distributed chat with microservice architecture that takes into account non-functional aspects such as scalability, resilience and responsiveness. Each chat has the following qualities: the messages sent must be displayed in the same order by all users. The chat supports dynamic set of participants. Finally, A user can request to be the only one to write in the chat for a limited time. Used Akka cluster with sharding and persistence.
 
 To ensure causal ordering among peers, I implementated the algorithm presented in M. Naimi and O. Thiare, "Distributed Mutual Exclusion Based on Causal Ordering", Journal of Computer Science 5.
 
