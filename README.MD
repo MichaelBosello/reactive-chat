@@ -1,4 +1,11 @@
-#Reactive chat
+# Reactive chat
+
+A reactive chat service that takes into account non-functional aspects such as scalability, resilience and responsiveness. Each chat has the following qualities: the messages sent must be displayed in the same order by all users. The chat supports dynamic set of participants. Finally, A user can request to be the only one to write in the chat for a limited time.
+
+To ensure causal ordering among peers, I implementated the algorithm presented in M. Naimi and O. Thiare, "Distributed Mutual Exclusion Based on Causal Ordering", Journal of Computer Science 5.
+
+## Run
+
 1. Go to package **backend.run.cluster** and start **RunCassandra**
 2. In the same package start one or more times all others main
 3. Start all mains in **backend.run.service**, one or more times
